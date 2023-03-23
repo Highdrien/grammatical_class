@@ -1,4 +1,5 @@
-prediction/data.txt
+.idea
+.gitignore
+__pycach__
 prediction/data_predicted.txt
 prediction/data_prediction.txt
-.idea

@@ -74,6 +74,9 @@ def config_to_yaml(config, space=''):
 
 
 def test_logger(path, metrics, values):
-    with open(os.path.join(path, 'test_log.csv'), 'w') as f:
+    """
+    creates a file 'test_log.txt' in the path containing for each line: metrics[i]: values[i]
+    """
+    with open(os.path.join(path, 'test_log.txt'), 'w') as f:
         for i in range(len(metrics)):
             f.write(metrics[i] + ': ' + str(values[i]) + '\n')
