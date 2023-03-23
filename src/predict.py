@@ -228,10 +228,7 @@ def prediction(experiment_path, config):
     if config.data.create_sequence == 'dummy':
         x = word_to_number(config.data, dummy_sequence(config.data, [sentence]), word_dictionary)
     elif config.data.create_sequence == 'smart':
-        print('sentence:', sentence, len(sentence))
         x = word_to_number(config.data, smart_sequence(config.data, sentence), word_dictionary)
-        print('x:', x)
-        print('x:', np.array(x).shape)
     else:
         raise "choose how to create sequence between 'dummy' or 'smart'"
 
@@ -245,9 +242,7 @@ def prediction(experiment_path, config):
         write_prediction(config, sentence, y_pred, label_dictionary)
 
     else:
-        print('y_pred:', y_pred.shape)
         y_pred = merge(config.data, sentence, y_pred)
-        print('y_pred:', y_pred)
         write_prediction(config, sentence[:-config.data.sequence_size], y_pred, label_dictionary)
 
 
@@ -259,7 +254,6 @@ def write_prediction(config, sentence, y_pred, label_dictionary):
    :param y_pred: prediction of the model
    :param label_dictionary: dictionary of the labels
    """
-    print(sentence)
     predict_file = config.predict.predict_file
     if predict_file is None:
         predict_file = config.predict.file_to_predict[:-len('.txt')] + '_predicted' + config.predict.file_to_predict[
@@ -284,10 +278,8 @@ def merge(config, sentence, y_pred):
     """
     sentence = sentence[:-config.sequence_size]
     idx = indice(config, sentence)
-    print('idx:', idx)
     result = []
     y_argmax = np.argmax(y_pred, axis=2)
-    print('y_argmax:', y_argmax)
     for i in range(len(sentence)):
         if len(idx[i]) == 1:
             a, b = idx[i][0]

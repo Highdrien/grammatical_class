@@ -36,17 +36,19 @@ def main(options):
         By default, the path_to_your_config = 'configs/configs.yaml'.
         The training will run, and you can find the results in the log folder.
 
-    To perform a test or a prediction, put --mode 'test' or 'predict' and -- experiment_path <your_experiment_path>
+    To perform a test or a prediction, put --mode 'test' or 'predict' and -- path <your_path>
         which is a folder containing: 'config.yaml' and the model weights (.h5 file)
+        this is done in such a way that if you train a model with a certain config that is going to be stored in
+        'logs/experiment_1', to test or predict it, you just have to put --path logs/experiment_1
     """
     if options['mode'] == 'train':
         __train(options['config_path'])
 
     elif options['mode'] == 'test':
-        __test(options['experiment_path'])
+        __test(options['path'])
 
     elif options['mode'] == 'predict':
-        __prediction(options['experiment_path'])
+        __prediction(options['path'])
 
     else:
         raise "choose a mode between 'train', 'test' and 'predict'"
@@ -58,7 +60,7 @@ if __name__ == "__main__":
     # Options
     parser.add_argument('--mode', default=None, type=str, help="choose a mode between 'train', 'test' and 'predict'")
     parser.add_argument('--config_path', default='configs\\config.yaml', type=str, help="path to config (just for training)")
-    parser.add_argument('--experiment_path', type=str, help="experiment path")
+    parser.add_argument('--path', type=str, help="experiment path")
 
     args = parser.parse_args()
     options = vars(args)  # convert to ordinary dict

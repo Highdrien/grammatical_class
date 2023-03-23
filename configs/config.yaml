@@ -46,5 +46,5 @@ test:
 predict:
     path: 'prediction'                     # path to the predict folder
     file_to_predict: 'data.txt'            # name of the file to be predicted
-    predict_file: null                     # file name of the model prediction
+    predict_file: null                     # file name of the model prediction (if null file will be file_to_predict + '_predicted')
     punctuation_file: 'punctuation.txt'    # punctuation file names

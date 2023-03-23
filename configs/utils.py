@@ -35,7 +35,7 @@ def train_logger(config, computed_metrics):
         f.write(first_line[:-1] + '\n')
 
         for i in range(len(computed_metrics['loss'])):
-            line = str(i) + ','
+            line = str(i + 1) + ','
             for key in computed_metrics.keys():
                 line += str(computed_metrics[key][i]) + ','
             f.write(line[:-1] + '\n')

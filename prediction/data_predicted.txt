@@ -1,0 +1,5 @@
+je : pronom
+pense : verbe
+donc : adverbe
+je : pronom
+suis : verbe
