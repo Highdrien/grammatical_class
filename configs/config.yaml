@@ -1,0 +1,50 @@
+purpose: 'default config'
+language: 'fr'                             # choose the language between 'fr', 'en' and 'de'
+
+# metrics
+metrics:
+    accuracy: 'accuracy'
+
+# model options
+model:
+    type: 'LSTM'                           # choose the type of model ('LSTM' or 'GRU')
+    embedding_dim: 64                      # dimension of the embedding
+    hidden_size: 64                        # dimensionality of the LSTM or GRU output space
+    dense: 64                              # number of neuron of the Dence layers
+    dropout: 0.25                          # rate of the dropout
+    loss: 'categorical_crossentropy'       # loss function
+    optimizer: 'adam'                      # optimizer
+    model_summary: false                   # print the model.summary
+
+# data options
+data:
+    data_path: 'data'                      # path to the data
+    sequence_size: 20                      # length of the sequence
+    pad_character: '<PAD>'                 # filler character
+    rate_not_add_to_dictionary: 0.05       # rate of words that will not be added to the dictionary of known words
+    create_sequence: 'smart'               # choice of how to cut the sentences: 'dummy' or 'smart'
+                                           # dummy makes the sequences disjointed
+                                           # smart makes the sequences overlap
+# train options
+train:
+    split: 0.7                             # rate of the training database and the validation database
+    batch_size: 64                         # training batch size
+    epochs: 5                              # number of epochs
+    save_learning_curves: true             # save the learning curves
+    logs_path: 'logs'                      # path to logs folder
+    save_checkpoint: true                  # if you want save the model's weight
+
+# validation options
+val:
+    batch_size: 64                         # validation batch size
+
+# test options
+test:
+    batch_size: 64                         # test batch size
+
+# predict options
+predict:
+    path: 'prediction'                     # path to the predict folder
+    file_to_predict: 'data.txt'            # name of the file to be predicted
+    predict_file: null                     # file name of the model prediction
+    punctuation_file: 'punctuation.txt'    # punctuation file names

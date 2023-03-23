@@ -1,0 +1,50 @@
+config_metadata: 'Saving time : 03/22/2023, 20:22:27'
+purpose: 'config with smart sequence'
+language: 'fr'
+
+# metrics options
+metrics:
+  accuracy: 'accuracy'
+
+# model options
+model:
+  type: 'LSTM'
+  embedding_dim: 64
+  hidden_size: 64
+  dense: 64
+  dropout: 0.25
+  loss: 'categorical_crossentropy'
+  optimizer: 'adam'
+  model_summary: false
+
+# data options
+data:
+  data_path: 'data'
+  sequence_size: 20
+  pad_character: '<PAD>'
+  rate_not_add_to_dictionary: 0.05
+  create_sequence: 'smart'
+
+# train options
+train:
+  split: 0.7
+  batch_size: 64
+  epochs: 5
+  save_learning_curves: true
+  logs_path: 'logs'
+  save_checkpoint: true
+
+# val options
+val:
+  batch_size: 64
+
+# test options
+test:
+  batch_size: 64
+
+# predict options
+predict:
+  path: 'prediction'
+  file_to_predict: 'data.txt'
+  predict_file: null
+  punctuation_file: 'punctuation.txt'
