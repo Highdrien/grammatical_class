@@ -1,0 +1,19 @@
+name: experiment
+save_experiment: true
+
+# data options
+data: 
+  
+
+# model options
+model:
+  
+
+# learning options
+learning:
+  optimizer: adam             # optimizer. Only adam is implemented
+  learning_rate: 0.01         # learning rate
+  milesstone: [5, 15]         # gradient decay at epoch 5 and 15
+  gamma: 0.1                  # learning rate will be multiplicate by 0.1 at epochs 5 and 15
+  epochs: 30                  # number of epochs
+  
