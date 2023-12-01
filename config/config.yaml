@@ -2,8 +2,14 @@ name: experiment
 save_experiment: true
 
 # data options
-data: 
-  
+data:
+  path: data
+  language: English
+  sequence_length: 10
+  pad: <PAD>
+  sequence_function: dummy
+  indexes: [1, 3]
+  dicopath: dictionary
 
 # model options
 model:

@@ -1,3 +1,5 @@
+# Open data and get each setence
+
 import os
 from typing import List, Union
 from icecream import ic
@@ -7,10 +9,10 @@ Word_Info = List[str]       # example: ['6', 'flights', 'flight', 'NOUN', '_', '
 Sentence = List[Word_Info]  # list of word info
 
 
-def get_data(files: Union[str, List[str]], index: List[int]) -> List[Sentence]:
-    """ get a list a word of the file or a list of file.
-    get only the information word[index[i]] for i in index
-    index representation:
+def get_data(files: Union[str, List[str]], indexes: List[int]) -> List[Sentence]:
+    """ get a list of Sentences of the file or a list of file.
+    get only the information word[indexes[i]] for i in indexes
+    indexes representation:
     0: id       1: word    2: lemma   3: pos   4: unk
     5: morphy   6: syntax  7: unk     8: unk   9: unk 
     """
@@ -27,7 +29,7 @@ def get_data(files: Union[str, List[str]], index: List[int]) -> List[Sentence]:
                 else:
                     if line[0] != '#':
                         line_split = line.split('\t')
-                        sequence.append([line_split[i] for i in index])
+                        sequence.append([line_split[i] for i in indexes])
         f.close()
         if len(sequence) != 0:
             data.append(sequence)
@@ -68,12 +70,17 @@ def get_file_for_mode(folder_list: List[str], mode: str) -> List[str]:
     return files
 
 
+def get_word_index_in_indexes(indexes: List[int]) -> int:
+    assert 1 in indexes, f"Error, 1 is not in indexes (1: word)"
+    return indexes.index(1)
+    
+
 if __name__ == '__main__':
-    data_path = os.path.join('..', 'data')
+    data_path = os.path.join('..', '..', 'data')
 
     file_path = os.path.join(data_path, 'UD_English-Atis', 'en_atis-ud-train.conllu')
-    index = [0, 1, 5]
-    data = get_data(files=file_path, index=index)
+    indexes = [0, 1, 5]
+    data = get_data(files=file_path, indexes=indexes)
     ic('sentences numbers:', len(data))
     ic('words numbers in the first setences:', len(data[0]))
     ic('information numbers in the word:', len(data[0][0]))
@@ -83,7 +90,7 @@ if __name__ == '__main__':
     files_train = get_file_for_mode(folder_list=folders, mode='train')
     ic(files_train)
 
-    data = get_data(files=files_train, index=[0, 1, 5])
+    data = get_data(files=files_train, indexes=[0, 1, 5])
     ic(data[30])
 
     pass
