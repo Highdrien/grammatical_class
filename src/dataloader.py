@@ -23,10 +23,10 @@ def get_data(files: Union[str, List[str]], index: List[int]) -> List[Sentence]:
             for line in f.readlines():
                 if len(line) <= 1 and len(sequence) != 0:
                     data.append(sequence)
+                    sequence = []
                 else:
                     if line[0] != '#':
                         line_split = line.split('\t')
-                        # print(line_split)
                         sequence.append([line_split[i] for i in index])
         f.close()
         if len(sequence) != 0:
@@ -54,8 +54,8 @@ def get_foldersname_from_language(datapath: str, language: str) -> List[str]:
     
 def get_file_for_mode(folder_list: List[str], mode: str) -> List[str]:
     """
-    take a list of folder and a mode (train, val or test) and give a
-    list a file for the good mode
+    take a list of folder and a mode (train, val or test) 
+    and give a list a file for the good mode
     """
     assert mode in ['train', 'val', 'test'], f"expected mode be train, val or test but found {mode}"
     name_mode = mode if mode in ['train', 'test'] else 'dev'
@@ -74,17 +74,16 @@ if __name__ == '__main__':
     file_path = os.path.join(data_path, 'UD_English-Atis', 'en_atis-ud-train.conllu')
     index = [0, 1, 5]
     data = get_data(files=file_path, index=index)
-    ic(len(data))
-    for i in range(10):
-        ic(len(data[i]))
+    ic('sentences numbers:', len(data))
+    ic('words numbers in the first setences:', len(data[0]))
+    ic('information numbers in the word:', len(data[0][0]))
 
-    # folders = get_foldersname_from_language(datapath=data_path, language='English')
-    # ic(folders)
-    # files_train = get_file_for_mode(folder_list=folders, mode='train')
-    # ic(files_train)
+    folders = get_foldersname_from_language(datapath=data_path, language='English')
+    ic(folders)
+    files_train = get_file_for_mode(folder_list=folders, mode='train')
+    ic(files_train)
 
-    # data = get_data(files=files_train, index=[0, 1, 5])
-    # for i in range(100):
-    #     ic(data[i])
+    data = get_data(files=files_train, index=[0, 1, 5])
+    ic(data[30])
 
     pass
