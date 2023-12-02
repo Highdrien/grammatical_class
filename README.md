@@ -6,7 +6,8 @@ avoir les Traits morphologiques pour chaque mots à partir de phrase.
 - find the data here: http://hdl.handle.net/11234/1-5287
 - Download all files in item
 - unzip it
-- use `tar -xvzf /path/to/yourfile.tgz` to unstack the tgz file
+- keep only the file `ud-treebanks-v2.13.tgz`
+- use `tar -xvzf ud-treebanks-v2.13.tgz` to unstack the tgz file
 - and move data in order have a path like:
 
    .                     
@@ -50,3 +51,9 @@ data:
 ```
 
 
+## Create sequences:
+'dummy': This is the most basic way. We cut the sentences without overlapping and add a completion character at the end to get the right size. For example, the sentence:\
+   ['`I`', '`think`', '`,`', '`threfore`', '`I`', '`am`', '`.`']\
+    will become\
+   [['`I`', '`think`', '`,`', '`threfore`'], ['`I`', '`am`', '`.`', '`PAD`']]\
+   if sequence_size is 4 and the completion character is '`PAD`'. 
