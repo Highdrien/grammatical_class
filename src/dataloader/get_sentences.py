@@ -9,7 +9,7 @@ Word_Info = List[str]       # example: ['6', 'flights', 'flight', 'NOUN', '_', '
 Sentence = List[Word_Info]  # list of word info
 
 
-def get_data(files: Union[str, List[str]], indexes: List[int]) -> List[Sentence]:
+def get_sentences(files: Union[str, List[str]], indexes: List[int]) -> List[Sentence]:
     """ get a list of Sentences of the file or a list of file.
     get only the information word[indexes[i]] for i in indexes
     indexes representation:
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 
     file_path = os.path.join(data_path, 'UD_English-Atis', 'en_atis-ud-train.conllu')
     indexes = [0, 1, 5]
-    data = get_data(files=file_path, indexes=indexes)
+    data = get_sentences(files=file_path, indexes=indexes)
     ic('sentences numbers:', len(data))
     ic('words numbers in the first setences:', len(data[0]))
     ic('information numbers in the word:', len(data[0][0]))
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     files_train = get_file_for_mode(folder_list=folders, mode='train')
     ic(files_train)
 
-    data = get_data(files=files_train, indexes=[0, 1, 5])
+    data = get_sentences(files=files_train, indexes=[0, 1, 5])
     ic(data[30])
 
     pass

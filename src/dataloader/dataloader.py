@@ -7,7 +7,7 @@ from typing import List
 
 import get_sentences
 import get_sequences
-import dictionary
+import vocabulary
 
 
 Word_Info = List[str]       # example: ['6', 'flights', 'flight', 'NOUN', '_', 'Number=Plur', '1', 'obj', '_', '_']
@@ -19,30 +19,39 @@ def get_data(cfg: EasyDict, mode: str) -> List[Sequence]:
     folders = get_sentences.get_foldersname_from_language(datapath=cfg.path,
                                                           language=cfg.language)
     files = get_sentences.get_file_for_mode(folder_list=folders, mode=mode)
-    data = get_sentences.get_data(files=files, indexes=cfg.indexes)
+    data = get_sentences.get_sentences(files=files, indexes=cfg.indexes)
+
     word_index = get_sentences.get_word_index_in_indexes(cfg.indexes)
-    if mode == 'train':
-        dico = dictionary.create_dico(data, word_index=word_index, pad=cfg.pad)
-        dico_path = os.path.join(cfg.dicopath, cfg.language + '.json')
-        dictionary.save_dictionary(dico, path=dico_path)
+    vocab_path = os.path.join(cfg.vocab.path, cfg.language + '.json')
+    
+    if cfg.vocab.save and mode == 'train':
+        vocab = vocabulary.create_vocab(data, word_index=word_index, pad=cfg.pad, unk=cfg.unk)
+        vocabulary.save_vocab(vocab, path=vocab_path)
+    else:
+        vocab_path = os.path.join(cfg.vocab.path, cfg.language + '.json')
+        vocab = vocabulary.load_dictionary(filepath=vocab_path)
+    
     sequence_function = get_sequences.find_sequence_function(cfg.sequence_function)
     data = get_sequences.create_sequences(sentences=data,
                                           sequence_function=sequence_function,
                                           k=cfg.sequence_length,
                                           pad=cfg.pad)
+    
+    vocabulary.replace_word2int(data,
+                                word_index=word_index,
+                                vocab=vocab,
+                                unk_rate=cfg.vocab.unk_rate,
+                                unk=cfg.unk)
+
     return data
 
 
 if __name__ == '__main__':
-    config = {'path': os.path.join('..', '..', 'data'),
-              'language': 'English',
-              'sequence_length': 10,
-              'pad': '<PAD>',
-              'sequence_function': 'dummy',
-              'indexes': [1, 3],
-              'dicopath': os.path.join('..', '..', 'dictionary')}
+    # must to run dataloader like python .\src\dataloader\dataloader.py
+    import yaml
+    config = EasyDict(yaml.safe_load(open('config/config.yaml', 'r')))
     ic(config)
-    data = get_data(cfg=EasyDict(config), mode='train')
+    data = get_data(cfg=config.data, mode='train')
     for i in range(4):
         ic(i, data[i])
     
