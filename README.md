@@ -57,3 +57,11 @@ data:
     will become\
    [['`I`', '`think`', '`,`', '`threfore`'], ['`I`', '`am`', '`.`', '`PAD`']]\
    if sequence_size is 4 and the completion character is '`PAD`'. 
+
+## Get Embeddings:
+
+In order to get embeddings you need first to download the embedding model from google, you can find it here: https://drive.google.com/u/0/uc?id=0B7XkCwpI5KDYNlNUTTlSS21pQmM&export=download , once you downloaded it, extract the .bin file and put it in the working directory.
+Configure the variable 'MODEL_PATH' in the file 'get_embeddings.py' to replace it
+by the path of the .bin file you just downloaded.
+Then run the file 'get_embeddings.py' to get the embeddings of the words in the vocabulary.
+
