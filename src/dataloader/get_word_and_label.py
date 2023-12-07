@@ -12,7 +12,7 @@ def split_data_to_word_label(data: List[Sequence],
                              ) -> Tuple[List[List[int]], List[List[int]]]:
     """ split data to have word x and label y
     label str will be replace with the convert_label_function 
-            like convert_pos or convert_murphy (see convert_label.py)"""
+            like convert_pos or convert_morphy (see convert_label.py)"""
     len_word_info = len(data[0][0])
     assert word_index < len_word_info, f"Error, word_index={word_index} is higher that len(word_info):{len_word_info}"
     x, y = [], []
