@@ -1,89 +1,100 @@
 from torch import Tensor
 import torch.nn as nn
-from easydict import EasyDict
-from transformers import BertModel
+from numpy import prod
+
+from typing import List, Union
 
 
-class LSTM(nn.Module):
+class LSTMClassifier(nn.Module):
     def __init__(self,
-                 num_word: int,
+                 num_words: int,
                  embedding_size: int,
-                 hidden_layer_size: int,
-                 num_classes: int
+                 lstm_hidd_size_1: int,
+                 lstm_hidd_size_2: Union[int, None],
+                 fc_hidd_size: List[int],
+                 num_classes: int,
+                 bidirectional: bool,
+                 activation: str
                  ) -> None:
-        super(LSTM, self).__init__()
-        self.embedding = nn.Embedding(num_embeddings=num_word,
+        super(LSTMClassifier, self).__init__()
+        self.embedding = nn.Embedding(num_embeddings=num_words,
                                       embedding_dim=embedding_size)
-        self.lstm = nn.LSTM(input_size=embedding_size,
-                            hidden_size=hidden_layer_size,
-                            batch_first=True)
-        self.fc = nn.Linear(in_features=hidden_layer_size,
-                            out_features=num_classes)
+        
+        # LSTM Layers
+        mul = 2 if bidirectional else 1
+        self.lstm_1 = nn.LSTM(input_size=embedding_size,
+                              hidden_size=lstm_hidd_size_1,
+                              batch_first=True,
+                              bidirectional=bidirectional)
+
+        self.have_lstm_2 = lstm_hidd_size_2 is not None
+        if self.have_lstm_2:
+            self.lstm_2 = nn.LSTM(input_size=lstm_hidd_size_1 * mul,
+                                  hidden_size=lstm_hidd_size_2,
+                                  batch_first=True,
+                                  bidirectional=bidirectional)
+        
+        assert activation in ['relu', 'sigmoid'], f"Error, activation must be relu or sigmoid but found '{activation}'"
+        self.activation = nn.ReLU() if activation == 'relu' else nn.Sigmoid()
+
+        # Fully Connected Layers
+        last_lstm_hidd_layers_size = lstm_hidd_size_1 if not self.have_lstm_2 else lstm_hidd_size_2
+        fc_hidd_size = [last_lstm_hidd_layers_size * mul] + fc_hidd_size + [num_classes]
+        self.fc = []
+
+        for i in range(len(fc_hidd_size) - 1):
+            self.fc.append(self.activation)
+            self.fc.append(nn.Linear(in_features=fc_hidd_size[i],
+                                     out_features=fc_hidd_size[i + 1]))
+        self.fc = nn.Sequential(*self.fc)
 
     def forward(self, x: Tensor) -> Tensor:
         """ forward
         take x Tensor with shape: (B, K)
-        return output Tensor with shape: (B, C, K)
+        return output Tensor with shape: (B, K, C)
+
         where:
             B: batch_size
             K: sequence size
             C: number of classes
         """
-        embedded = self.embedding(x)
-        lstm_out, _ = self.lstm(embedded)
-        output = self.fc(lstm_out)
-        return output
-    
+        x = self.embedding(x)
+        x = self.activation(x)
 
-class BiLSTMClassifier(nn.Module):
-    def __init__(self, input_size, embedding_size, hidden_size, output_size):
-        super(BiLSTMClassifier, self).__init__()
-        self.embedding = nn.Embedding(input_size, embedding_size)
-        self.lstm = nn.LSTM(embedding_size, hidden_size, batch_first=True, bidirectional=True)
-        self.relu = nn.ReLU()
-        self.fc = nn.Linear(hidden_size * 2, output_size)  # Multiply hidden_size by 2 for bidirectional
+        x, _ = self.lstm_1(x)
 
-    def forward(self, x):
-        embedded = self.embedding(x)
-        lstm_out, _ = self.lstm(embedded)
-        lstm_out = self.relu(lstm_out)
-        output = self.fc(lstm_out)
+        if self.have_lstm_2:
+            x, _ = self.lstm_2(x)
         
-        return output
+        logits = self.fc(x)
+        return logits
+    
+    def get_number_parameters(self) -> int:
+        """ return the number of parameters of the model """
+        return sum([prod(param.size()) for param in self.parameters()])
     
 
-class BertClassifier(nn.Module):
-    def __init__(self, pretrained_model_name, hidden_size, num_classes): #exemple name: 'bert-base-uncased' 'distilcamembert-base-ner'
-        super(BertClassifier, self).__init__()
-        self.bert = BertModel.from_pretrained(pretrained_model_name) #pas nécéssaire de spécifier l'input shape
-        self.dropout = nn.Dropout(0.1)  # You can adjust the dropout rate
-        self.fc = nn.Linear(hidden_size, num_classes)
+if __name__ == '__main__':
+    import torch
+    from icecream import ic
 
-    def forward(self, input_ids, attention_mask):
-        outputs = self.bert(input_ids, attention_mask=attention_mask)
-        pooled_output = outputs.pooler_output
-        pooled_output = self.dropout(pooled_output)
-        logits = self.fc(pooled_output)
-        return logits
+    model = LSTMClassifier(num_words=10,
+                           embedding_size=32,
+                           lstm_hidd_size_1=64,
+                           lstm_hidd_size_2=32,
+                           fc_hidd_size=[64],
+                           num_classes=6,
+                           bidirectional=True,
+                           activation='sigmoid')
+    
+    ic(model)
+    ic(model.get_number_parameters())
 
+    x = torch.randint(0, 10, (16, 12))
+    ic(x.shape)
 
+    y = model.forward(x)
 
+    # ic(y)
+    ic(y.shape)
 
-def get_model(config: EasyDict) -> LSTM:
-    """ get LSTM model according a configuration """
-
-    if config.model.model_name == "lstm":
-        model = LSTM(num_word=33992,
-                    embedding_size=config.model.embedding_size,
-                    hidden_layer_size=config.model.hidden_size,
-                    num_classes=config.model.num_classes)
-    elif config.model.model_name == "bilstm":
-        model = BiLSTMClassifier(input_size=33992,
-                                embedding_size=config.model.embedding_size,
-                                hidden_size=config.model.hidden_size,
-                                output_size=config.model.num_classes)
-    elif config.model.model_name == "bert":
-        model = BertClassifier(pretrained_model_name=config.model.pretrained_model_name,
-                                hidden_size=config.model.hidden_size,
-                                num_classes=config.model.num_classes)
-    return model
