@@ -12,9 +12,13 @@ class LSTM(nn.Module):
                  num_classes: int
                  ) -> None:
         super(LSTM, self).__init__()
-        self.embedding = nn.Embedding(num_word, embedding_size)
-        self.lstm = nn.LSTM(embedding_size, hidden_layer_size, batch_first=True)
-        self.fc = nn.Linear(hidden_layer_size, num_classes)
+        self.embedding = nn.Embedding(num_embeddings=num_word,
+                                      embedding_dim=embedding_size)
+        self.lstm = nn.LSTM(input_size=embedding_size,
+                            hidden_size=hidden_layer_size,
+                            batch_first=True)
+        self.fc = nn.Linear(in_features=hidden_layer_size,
+                            out_features=num_classes)
 
     def forward(self, x: Tensor) -> Tensor:
         """ forward
@@ -30,6 +34,7 @@ class LSTM(nn.Module):
         output = self.fc(lstm_out)
         return output
     
+
 class BiLSTMClassifier(nn.Module):
     def __init__(self, input_size, embedding_size, hidden_size, output_size):
         super(BiLSTMClassifier, self).__init__()
