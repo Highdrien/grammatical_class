@@ -37,7 +37,7 @@ class DataGenerator(Dataset):
                                                                      del_data_after=True)
         
         self.x = torch.tensor(self.x).to(torch.float32)
-        self.y = torch.tensor(self.y)
+        self.y = torch.tensor(self.y).to(torch.float32)
 
         assert len(self.x) == len(self.y), f"Error, len between word and label is not the same"
         self.num_data = len(self.x)
@@ -51,14 +51,14 @@ class DataGenerator(Dataset):
         """ return word: x and label: y
         if task == get_pos:
             shape x: (B, K)
-            shape y: (B, K, Nc)
+            shape y: (B, K)
 
             where:  B: batch size
                     K: sequence length
-                    Nc: number of classes (=19)
         """
         x = self.x[index]
-        y = F.one_hot(self.y[index], num_classes=self.num_classes).to(torch.float32)
+        # y = F.one_hot(self.y[index], num_classes=self.num_classes).to(torch.float32)
+        y = self.y[index]
         return x, y
     
     def get_label_index(self) -> int:
