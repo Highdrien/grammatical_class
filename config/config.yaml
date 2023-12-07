@@ -22,10 +22,13 @@ data:
 model:
   model_name: lstm
   task: get_pos               # choose between get_pos and get_morphy
+  num_classes: 19
+  hidden_size: 100
+  embedding_size: 100
 
 # learning options
 learning:
-  loss: unk                   # loss
+  loss: crossentropy          # loss
   optimizer: adam             # optimizer
   learning_rate: 0.01         # learning rate
   milesstone: [5, 15]         # gradient decay at epoch 5 and 15
