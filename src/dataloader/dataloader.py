@@ -48,6 +48,15 @@ class DataGenerator(Dataset):
         return self.num_data
 
     def __getitem__(self, index: int) -> Tuple[Tensor, Tensor]:
+        """ return word: x and label: y
+        if task == get_pos:
+            shape x: (B, K)
+            shape y: (B, K, Nc)
+
+            where:  B: batch size
+                    K: sequence length
+                    Nc: number of classes (=19)
+        """
         x = self.x[index]
         y = F.one_hot(self.y[index], num_classes=self.num_classes).to(torch.float32)
         return x, y
