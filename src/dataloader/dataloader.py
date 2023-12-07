@@ -25,7 +25,7 @@ class DataGenerator(Dataset):
 
         self.indexes = config.data.indexes
         self.word_index = get_sentences.get_word_index_in_indexes(self.indexes)
-        self.task = config.model.task
+        self.task = config.task.task_name
         self.label_index = self.get_label_index()
         self.num_classes = 19 if self.task == 'get_pos' else None
 
@@ -100,6 +100,10 @@ def get_data(cfg: EasyDict, mode: str) -> Tuple[List[Sequence], Dict[str, int]]:
     else:
         vocab_path = os.path.join(cfg.vocab.path, cfg.language + '.json')
         vocab = vocabulary.load_dictionary(filepath=vocab_path)
+    
+    if mode == 'train':
+        cfg.vocab.num_words = len(vocab)
+        print(f"vocab size: {cfg.vocab.num_words}")
     
     sequence_function = get_sequences.find_sequence_function(cfg.sequence_function)
     data = get_sequences.create_sequences(sentences=data,

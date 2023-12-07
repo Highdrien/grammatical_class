@@ -31,6 +31,7 @@ def train(config: EasyDict) -> None:
     model = get_model(config)
     model = model.to(device)
     ic(model)
+    ic(model.get_number_parameters())
     
     # Loss
     assert config.learning.loss == 'crossentropy', NotImplementedError(
@@ -126,8 +127,7 @@ def train(config: EasyDict) -> None:
                 print('save model weights')
                 torch.save(model.state_dict(), os.path.join(logging_path, 'checkpoint.pt'))
                 best_val_loss = val_loss
-        
-        ic(best_val_loss)
+                ic(best_val_loss)
 
     stop_time = time.time()
     print(f"training time: {stop_time - start_time}secondes for {config.learning.epochs} epochs")

@@ -17,20 +17,32 @@ data:
     path: dictionary          # path to save the vocabulary
     unk_rate: 0.01            # rate to replace a knowing word by <UNK>
     save: false               # save the vocabulary or load it from data.voc.path
+    num_words: 33992
+
+task:
+  task_name: get_pos          # choose between get_pos and get_morphy
+
+  get_pos_info:
+    num_classes: 19           # num classes of POS
+
+  get_morphy_info:
+    not_implemented: Null
 
 # model options
 model:
   model_name: lstm            # choose between lstm or bert
-  task: get_pos               # choose between get_pos and get_morphy
-  num_classes: 19
+
+  # LSTM Classifier
   lstm:
-    lstm_hidd_size_1: 64     # first hidden layer size of LSTM layers
-    lstm_hidd_size_2: Null      # second hidden layer size of LSTM layers. Put Null if you want only one LSTM Module
-    fc_hidd_size: []    # hidden layers of fully connected layers. Do not specify the last layers,
+    lstm_hidd_size_1: 64      # first hidden layer size of LSTM layers
+    lstm_hidd_size_2: Null    # second hidden layer size of LSTM layers. Put Null if you want only one LSTM Module
+    fc_hidd_size: []          # hidden layers of fully connected layers. Do not specify the last layers,
                                 # so [] means just one fc layers with output = num_classes
-    embedding_size: 64       # embedding size
-    bidirectional: true
+    embedding_size: 64        # embedding size
+    bidirectional: true       # lstm layers bidirectional
     activation: relu          # activation function btw layer: relu or sigmoid
+
+  # BERT CLassifier
   bert:
     hidd_size: 100
     pretrained_model_name: bert-base-uncased
@@ -42,9 +54,9 @@ learning:
   learning_rate: 0.01         # learning rate
   milesstone: [5, 15]         # gradient decay at epoch 5 and 15
   gamma: 0.1                  # learning rate will be multiplicate by 0.1 at epochs 5 and 15
-  epochs: 10                  # number of epochs
+  epochs: 30                  # number of epochs
   batch_size: 2048            # batch size
-  shuffle: true
-  drop_last: true
-  save_checkpoint: true
+  shuffle: true               # shuffle batches
+  drop_last: true             # drop the last batch
+  save_checkpoint: true       # save model weigth
   

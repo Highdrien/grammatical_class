@@ -20,3 +20,7 @@ class BertClassifier(nn.Module):
         pooled_output = self.dropout(pooled_output)
         logits = self.fc(pooled_output)
         return logits
+    
+    def get_number_parameters(self) -> int:
+        """ return the number of parameters of the model """
+        return sum([prod(param.size()) for param in self.parameters()])

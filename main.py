@@ -6,6 +6,7 @@ from icecream import ic
 from typing import Optional
 
 from src.train import train
+from config.process_config import process_config
 
 
 def load_config(path: Optional[str]='config/config.yaml') -> EasyDict:
@@ -35,6 +36,7 @@ def main(options: dict) -> None:
 
     if options['mode'] == 'train':
         config = load_config(options['config_path'])
+        process_config(config)
         ic(config)
         train(config)
 
