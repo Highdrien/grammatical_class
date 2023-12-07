@@ -71,8 +71,19 @@ class BertClassifier(nn.Module):
 
 def get_model(config: EasyDict) -> LSTM:
     """ get LSTM model according a configuration """
-    model = LSTM(num_word=33992,
-                 embedding_size=config.model.embedding_size,
-                 hidden_layer_size=config.model.hidden_size,
-                 num_classes=config.model.num_classes)
+
+    if config.model.model_name == "lstm":
+        model = LSTM(num_word=33992,
+                    embedding_size=config.model.embedding_size,
+                    hidden_layer_size=config.model.hidden_size,
+                    num_classes=config.model.num_classes)
+    elif config.model.model_name == "bilstm":
+        model = BiLSTMClassifier(input_size=33992,
+                                embedding_size=config.model.embedding_size,
+                                hidden_size=config.model.hidden_size,
+                                output_size=config.model.num_classes)
+    elif config.model.model_name == "bert":
+        model = BertClassifier(pretrained_model_name=config.model.pretrained_model_name,
+                                hidden_size=config.model.hidden_size,
+                                num_classes=config.model.num_classes)
     return model

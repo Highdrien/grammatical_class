@@ -20,7 +20,7 @@ data:
 
 # model options
 model:
-  model_name: lstm
+  model_name: bilstm
   task: get_pos               # choose between get_pos and get_morphy
   num_classes: 19
   hidden_size: 100
