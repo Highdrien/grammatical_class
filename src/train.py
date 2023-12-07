@@ -3,23 +3,22 @@ import torch
 from torch.optim.lr_scheduler import MultiStepLR
 from tqdm import tqdm
 import time
-import numpy as np
 from easydict import EasyDict
 from icecream import ic
 
 from src.dataloader.dataloader import create_dataloader
-from src.model.LSTM import get_model
-# from config.config import train_logger, train_step_logger
+from src.model.get_model import get_model
+from config.config import train_logger, train_step_logger
 
 
 def train(config: EasyDict) -> None:
 
-    # # Use gpu or cpu
-    # if torch.cuda.is_available():
-    #     device = torch.device("cuda")
-    # else:
-    #     device = torch.device("cpu")
-    device = torch.device("cpu")
+    # Use gpu or cpu
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
+    # device = torch.device("cpu")
     ic(device)
 
     # Get data
@@ -44,11 +43,11 @@ def train(config: EasyDict) -> None:
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning.learning_rate)
     scheduler = MultiStepLR(optimizer, milestones=config.learning.milesstone, gamma=config.learning.gamma)
 
-    # save_experiment = config.save_experiment
-    # ic(save_experiment)
-    # if save_experiment:
-    #     logging_path = train_logger(config)
-    #     best_val_loss = 10e6
+    save_experiment = config.save_experiment
+    ic(save_experiment)
+    if save_experiment:
+        logging_path = train_logger(config)
+        best_val_loss = 10e6
 
 
     ###############################################################
@@ -104,7 +103,7 @@ def train(config: EasyDict) -> None:
                 
                 val_loss += loss.item()
 
-                val_range.set_description(f"VAL  -> epoch: {epoch} || loss: {loss.item():.4f}")
+                val_range.set_description(f"VAL   -> epoch: {epoch} || loss: {loss.item():.4f}")
                 val_range.refresh()
         
         scheduler.step()
@@ -114,31 +113,21 @@ def train(config: EasyDict) -> None:
         ###################################################################
         train_loss = train_loss / n_train
         val_loss = val_loss / n_val
-        train_metrics = train_metrics / n_train
-        val_metrics = val_metrics / n_val
+        # train_metrics = train_metrics / n_train
+        # val_metrics = val_metrics / n_val
         
-        # if save_experiment:
-        #     train_step_logger(path=logging_path, 
-        #                       epoch=epoch, 
-        #                       train_loss=train_loss, 
-        #                       val_loss=val_loss, 
-        #                       train_metrics=train_metrics, 
-        #                       val_metrics=val_metrics)
+        if save_experiment:
+            train_step_logger(path=logging_path, 
+                              epoch=epoch, 
+                              train_loss=train_loss, 
+                              val_loss=val_loss)
             
-        #     if config.learning.save_checkpoint and val_loss < best_val_loss:
-        #         print('save model weights')
-        #         torch.save(model.state_dict(), os.path.join(logging_path, 'checkpoint.pt'))
-        #         best_val_loss = val_loss
+            if config.learning.save_checkpoint and val_loss < best_val_loss:
+                print('save model weights')
+                torch.save(model.state_dict(), os.path.join(logging_path, 'checkpoint.pt'))
+                best_val_loss = val_loss
         
-        # ic(best_val_loss)
+        ic(best_val_loss)
 
     stop_time = time.time()
     print(f"training time: {stop_time - start_time}secondes for {config.learning.epochs} epochs")
-
-
-
-if __name__ == '__main__':
-    # must to run dataloader like python .\src\train.py
-    import yaml
-    config = EasyDict(yaml.safe_load(open('config/config.yaml', 'r')))
-    train(config=config)

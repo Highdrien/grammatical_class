@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List
+from typing import Dict, List, Optional
 from datetime import datetime
 from easydict import EasyDict
 
@@ -80,8 +80,9 @@ def train_step_logger(path: str,
                       epoch: int, 
                       train_loss: float,
                       val_loss: float, 
-                      train_metrics: List[float], 
-                      val_metrics: List[float]) -> None:
+                      train_metrics: Optional[List[float]]=[], 
+                      val_metrics: Optional[List[float]]=[]
+                      ) -> None:
     """
     writes loss and metrics values in the train_log.csv
     """
