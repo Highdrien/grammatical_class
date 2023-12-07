@@ -1,8 +1,0 @@
-sentence_size: 4
-embedding_size: 6
-hidden_size: 100
-num_classes: 3
-num_epochs: 10
-batch_size: 64
-seed: 42
-model_save_path: "model.pth"
