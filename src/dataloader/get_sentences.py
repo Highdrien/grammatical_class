@@ -4,7 +4,6 @@ import os
 from typing import List, Union
 from icecream import ic
 
-
 Word_Info = List[str]       # example: ['6', 'flights', 'flight', 'NOUN', '_', 'Number=Plur', '1', 'obj', '_', '_']
 Sentence = List[Word_Info]  # list of word info
 
@@ -76,21 +75,29 @@ def get_word_index_in_indexes(indexes: List[int]) -> int:
     
 
 if __name__ == '__main__':
-    data_path = os.path.join('..', '..', 'data')
-
+    data_path = os.path.join('..', '..', 'data') 
+    #get current file path
+    data_path = os.path.join(os.getcwd(), 'data')
     file_path = os.path.join(data_path, 'UD_English-Atis', 'en_atis-ud-train.conllu')
     indexes = [0, 1, 5]
     data = get_sentences(files=file_path, indexes=indexes)
-    ic('sentences numbers:', len(data))
-    ic('words numbers in the first setences:', len(data[0]))
-    ic('information numbers in the word:', len(data[0][0]))
+    #ic('sentences numbers:', len(data))
+    #ic('words numbers in the first setences:', len(data[0]))
+    #ic('information numbers in the word:', len(data[0][0]))
+
+    print('sentences numbers:', len(data))
 
     folders = get_foldersname_from_language(datapath=data_path, language='English')
-    ic(folders)
+    #print('folders:', folders)
+    #ic(folders)
     files_train = get_file_for_mode(folder_list=folders, mode='train')
-    ic(files_train)
+    #ic(files_train)
+    #print('files_train:', files_train)
 
     data = get_sentences(files=files_train, indexes=[0, 1, 5])
-    ic(data[30])
+    #get all features of the first word of the first sentence
+    data = get_sentences(files=files_train, indexes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    print(data[0])
+    #ic(data[30])
 
     pass

@@ -16,6 +16,17 @@ Sequence = List[Word_Info]  # list of word info with the same length
 
 
 def get_data(cfg: EasyDict, mode: str) -> List[Sequence]:
+    """
+    Retrieves the data for a given mode (train, test, or validation) based on the provided configuration.
+
+    Args:
+        cfg (EasyDict): The configuration object containing the necessary parameters.
+        mode (str): The mode for which to retrieve the data.
+
+    Returns:
+        List[Sequence]: The processed data in the form of sequences.
+
+    """
     folders = get_sentences.get_foldersname_from_language(datapath=cfg.path,
                                                           language=cfg.language)
     files = get_sentences.get_file_for_mode(folder_list=folders, mode=mode)
@@ -50,10 +61,14 @@ if __name__ == '__main__':
     # must to run dataloader like python .\src\dataloader\dataloader.py
     import yaml
     config = EasyDict(yaml.safe_load(open('config/config.yaml', 'r')))
-    ic(config)
+    #ic(config)
+    print(config)
     data = get_data(cfg=config.data, mode='train')
     for i in range(4):
-        ic(i, data[i])
+        #ic(i, data[i])
+        print("i: ", i)
+        print("data[i]: ", data[i])
+       
     
    
     
