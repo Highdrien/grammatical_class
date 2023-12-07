@@ -4,13 +4,13 @@ from typing import List, Tuple, Dict
 
 import torch
 from torch.utils.data import Dataset, DataLoader
-import torch.nn.functional as F
+# import torch.nn.functional as F
 
-import get_sentences
-import get_sequences
-import vocabulary
-import convert_label
-import get_word_and_label
+import src.dataloader.get_sentences as get_sentences
+import src.dataloader.get_sequences as get_sequences
+import src.dataloader.vocabulary as vocabulary
+import src.dataloader.convert_label as convert_label
+import src.dataloader.get_word_and_label as get_word_and_label
 
 
 Word_Info = List[str]       # example: ['6', 'flights', 'flight', 'NOUN', '_', 'Number=Plur', '1', 'obj', '_', '_']
@@ -36,8 +36,8 @@ class DataGenerator(Dataset):
                                                                      convert_label=convert_label.get_convert_function(task=self.task),
                                                                      del_data_after=True)
         
-        self.x = torch.tensor(self.x).to(torch.float32)
-        self.y = torch.tensor(self.y).to(torch.float32)
+        self.x = torch.tensor(self.x).to(torch.long)
+        self.y = torch.tensor(self.y).to(torch.long)
 
         assert len(self.x) == len(self.y), f"Error, len between word and label is not the same"
         self.num_data = len(self.x)

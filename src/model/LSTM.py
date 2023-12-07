@@ -1,28 +1,39 @@
-import torch
+from torch import Tensor
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-import numpy as np
-import pandas as pd
+from easydict import EasyDict
 
 
-# Définir le modèle LSTM
+class LSTM(nn.Module):
+    def __init__(self,
+                 num_word: int,
+                 embedding_size: int,
+                 hidden_layer_size: int,
+                 num_classes: int
+                 ) -> None:
+        super(LSTM, self).__init__()
+        self.embedding = nn.Embedding(num_word, embedding_size)
+        self.lstm = nn.LSTM(embedding_size, hidden_layer_size, batch_first=True)
+        self.fc = nn.Linear(hidden_layer_size, num_classes)
 
-#Forme de l'entrée: (batch_size, sequence_length) on donne au réseau un vecteur d'identifiants de mots EX: [1, 3, 5, 4, 7]
-#Forme de la sortie: (batch_size, sequence_length, num_classes) on veut que le réseau nous donne un vecteur de probabilités pour chaque mot de la séquence EX: [[0.1, 0.2, 0.7], [0.3, 0.4, 0.3], [0.2, 0.5, 0.3], [0.1, 0.8, 0.1], [0.2, 0.3, 0.5]]
-
-class LSTMClassifier(nn.Module):
-    def __init__(self, input_size, embedding_size, hidden_size, output_size):
-        super(LSTMClassifier, self).__init__()
-        self.embedding = nn.Embedding(input_size, embedding_size)
-        self.lstm = nn.LSTM(embedding_size, hidden_size, batch_first=True)
-        self.fc = nn.Linear(hidden_size, output_size)
-        self.softmax = nn.LogSoftmax(dim=2)  # Utilisez dim=2 pour softmax sur la dimension temporelle
-
-    def forward(self, x):
+    def forward(self, x: Tensor) -> Tensor:
+        """ forward
+        take x Tensor with shape: (B, K)
+        return output Tensor with shape: (B, C, K)
+        where:
+            B: batch_size
+            K: sequence size
+            C: number of classes
+        """
         embedded = self.embedding(x)
         lstm_out, _ = self.lstm(embedded)
         output = self.fc(lstm_out)
-        output = self.softmax(output)
         return output
 
+
+def get_model(config: EasyDict) -> LSTM:
+    """ get LSTM model according a configuration """
+    model = LSTM(num_word=33992,
+                 embedding_size=config.model.embedding_size,
+                 hidden_layer_size=config.model.hidden_size,
+                 num_classes=config.model.num_classes)
+    return model

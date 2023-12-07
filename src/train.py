@@ -7,8 +7,8 @@ import numpy as np
 from easydict import EasyDict
 from icecream import ic
 
-from dataloader.dataloader import create_dataloader
-from model.LSTM import LSTMClassifier
+from src.dataloader.dataloader import create_dataloader
+from src.model.LSTM import get_model
 # from config.config import train_logger, train_step_logger
 
 
@@ -32,7 +32,6 @@ def train(config: EasyDict) -> None:
     model = get_model(config)
     model = model.to(device)
     ic(model)
-    ic(model.get_number_parameters())
     
     # Loss
     assert config.learning.loss == 'crossentropy', NotImplementedError(
@@ -68,12 +67,8 @@ def train(config: EasyDict) -> None:
             x = x.to(device)
             y_true = y_true.to(device)
 
-            ic(x.shape)
-
             y_pred = model.forward(x)
             y_pred = y_pred.permute(0, 2, 1)
-
-            ic(y_pred.shape)
 
             loss = criterion(y_pred, y_true)
 
@@ -139,15 +134,6 @@ def train(config: EasyDict) -> None:
 
     stop_time = time.time()
     print(f"training time: {stop_time - start_time}secondes for {config.learning.epochs} epochs")
-
-
-
-def get_model(config: EasyDict) -> LSTMClassifier:
-    model = LSTMClassifier(input_size=config.data.sequence_length,
-                           embedding_size=config.model.embedding_size,
-                           hidden_size=config.model.hidden_size,
-                           output_size=config.data.num_classes)
-    return model
 
 
 
