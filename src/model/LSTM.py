@@ -7,6 +7,10 @@ import pandas as pd
 
 
 # Définir le modèle LSTM
+
+#Forme de l'entrée: (batch_size, sequence_length) on donne au réseau un vecteur d'identifiants de mots EX: [1, 3, 5, 4, 7]
+#Forme de la sortie: (batch_size, sequence_length, num_classes) on veut que le réseau nous donne un vecteur de probabilités pour chaque mot de la séquence EX: [[0.1, 0.2, 0.7], [0.3, 0.4, 0.3], [0.2, 0.5, 0.3], [0.1, 0.8, 0.1], [0.2, 0.3, 0.5]]
+
 class LSTMClassifier(nn.Module):
     def __init__(self, input_size, embedding_size, hidden_size, output_size):
         super(LSTMClassifier, self).__init__()
@@ -22,5 +26,3 @@ class LSTMClassifier(nn.Module):
         output = self.softmax(output)
         return output
 
-#Forme de l'entrée: (batch_size, sequence_length) on donne au réseau un vecteur d'identifiants de mots EX: [1, 3, 5, 4, 7]
-#Forme de la sortie: (batch_size, sequence_length, num_classes) on veut que le réseau nous donne un vecteur de probabilités pour chaque mot de la séquence EX: [[0.1, 0.2, 0.7], [0.3, 0.4, 0.3], [0.2, 0.5, 0.3], [0.1, 0.8, 0.1], [0.2, 0.3, 0.5]]
