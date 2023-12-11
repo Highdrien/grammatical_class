@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from icecream import ic
-from torcheval.metrics import MulticlassAccuracy
+from torchmetrics.classification import MulticlassAccuracy
 
 
 def compute_metrics(y_pred: torch.Tensor, y_true: torch.Tensor, num_classes: int) -> np.ndarray: 
@@ -16,8 +16,8 @@ def compute_metrics(y_pred: torch.Tensor, y_true: torch.Tensor, num_classes: int
 
 def accuracy_without_pad(y_pred: torch.Tensor, y_true: torch.Tensor, num_classes: int) -> list:
     """
-    y_pred : [B, C, k]
-    y_true : [B, k]
+    y_pred : [B, C, K]
+    y_true : [B, K]
     On récupère la micro et la moyenne du macro
     """
     pad_index = 10 # A ne pas considérer du y_true
