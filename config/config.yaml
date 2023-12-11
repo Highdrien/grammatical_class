@@ -1,5 +1,5 @@
 name: experiment
-save_experiment: true
+save_experiment: false
 
 # data options
 data:
@@ -30,7 +30,7 @@ task:
 
 # model options
 model:
-  model_name: lstm            # choose between lstm or bert
+  model_name: bert            # choose between lstm or bert
 
   # LSTM Classifier
   lstm:

@@ -18,7 +18,7 @@ def train(config: EasyDict) -> None:
         device = torch.device("cuda")
     else:
         device = torch.device("cpu")
-    # device = torch.device("cpu")
+    device = torch.device("cpu")
     ic(device)
 
     # Get data
