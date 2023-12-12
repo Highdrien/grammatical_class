@@ -35,12 +35,12 @@ have data configuration like:
 ```yaml
 data:
   path: data                  # data path
-  language: English           # Language of data
+  language: French            # Language of data
   sequence_length: 10         # length of sequence
   pad: <PAD>                  # pad caracter to make padding
   unk: <UNK>                  # unknow caracter
   sequence_function: dummy    # function to split sentences to sequences
-  indexes: [1, 3]             # index of information that will be recupered: 
+  indexes: [1, 3, 5]          # index of information that will be recupered: 
                                 # indexes representation: 
                                 # 0: id       1: word    2: lemma   3: pos   4: unk
                                 # 5: morphy   6: syntax  7: unk     8: unk   9: unk 
@@ -48,6 +48,7 @@ data:
     path: dictionary          # path to save the vocabulary
     unk_rate: 0.01            # rate to replace a knowing word by <UNK>
     save: true                # save the vocabulary or load it from data.voc.path
+    num_words: 67814
 ```
 
 
@@ -58,10 +59,9 @@ data:
    [['`I`', '`think`', '`,`', '`threfore`'], ['`I`', '`am`', '`.`', '`PAD`']]\
    if sequence_size is 4 and the completion character is '`PAD`'. 
 
-## Get Embeddings:
 
-In order to get embeddings you need first to download the embedding model from google, you can find it here: https://drive.google.com/u/0/uc?id=0B7XkCwpI5KDYNlNUTTlSS21pQmM&export=download , once you downloaded it, extract the .bin file and put it in the working directory.
-Configure the variable 'MODEL_PATH' in the file 'get_embeddings.py' to replace it
-by the path of the .bin file you just downloaded.
-Then run the file 'get_embeddings.py' to get the embeddings of the words in the vocabulary.
 
+# Questions
+- est ce que le fait d'ajouter les données POS augmente le resultas
+- full tags ou non
+- comparer avec une baseline
