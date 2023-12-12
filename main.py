@@ -6,6 +6,7 @@ from icecream import ic
 from typing import Optional
 
 from src.train import train
+from src.baseline.baseline_model import launch_baseline
 from config.process_config import process_config
 
 
@@ -28,7 +29,7 @@ def find_config(experiment_path: str) -> str:
     
     exit()
 
-IMPLEMENTED = ['train']
+IMPLEMENTED = ['train', 'baseline']
 
 def main(options: dict) -> None:
 
@@ -39,6 +40,10 @@ def main(options: dict) -> None:
         process_config(config)
         ic(config)
         train(config)
+    
+    if options['mode'] == 'baseline':
+        config = load_config(options['config_path'])
+        launch_baseline(config)
 
 
 if __name__ == "__main__":
