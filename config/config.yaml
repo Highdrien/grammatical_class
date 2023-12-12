@@ -4,7 +4,7 @@ save_experiment: false
 # data options
 data:
   path: data                  # data path
-  language: English           # Language of data
+  language: French            # Language of data
   sequence_length: 10         # length of sequence
   pad: <PAD>                  # pad caracter to make padding
   unk: <UNK>                  # unknow caracter
@@ -16,8 +16,8 @@ data:
   vocab:
     path: dictionary          # path to save the vocabulary
     unk_rate: 0.01            # rate to replace a knowing word by <UNK>
-    save: false               # save the vocabulary or load it from data.voc.path
-    num_words: 33992
+    save: true                # save the vocabulary or load it from data.voc.path
+    num_words: 67814
 
 task:
   task_name: get_pos          # choose between get_pos and get_morphy
@@ -30,7 +30,7 @@ task:
 
 # model options
 model:
-  model_name: bert            # choose between lstm or bert
+  model_name: lstm            # choose between lstm or bert
 
   # LSTM Classifier
   lstm:
