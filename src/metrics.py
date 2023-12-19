@@ -37,3 +37,4 @@ if __name__ == "__main__":
     y_pred = torch.rand((10, 19, 10))
     y_true = torch.randint(0, 19, (10, 10))
     ic(compute_metrics(y_pred, y_true, 19))
+    print(compute_metrics(y_pred, y_true, 19))

@@ -4,6 +4,9 @@ from easydict import EasyDict
 
 from src.train import train
 from config.process_config import process_config
+import os
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 
 def load_config(path: str) -> EasyDict:
