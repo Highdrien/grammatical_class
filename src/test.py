@@ -15,7 +15,7 @@ def test(config: EasyDict,checkpoint_name='get_pos_lstm_1') -> None:
         device = torch.device("cpu")
 
     # Get test data
-    _, test_generator = create_dataloader(config=config, mode='test')
+    test_generator, _ = create_dataloader(config=config, mode='test')
     n_test = len(test_generator)
 
     # Get model
