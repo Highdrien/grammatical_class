@@ -17,7 +17,7 @@ data:
     path: dictionary          # path to save the vocabulary
     unk_rate: 0.01            # rate to replace a knowing word by <UNK>
     save: true                # save the vocabulary or load it from data.voc.path
-    num_words: 67814
+    num_words: 33992
 
 task:
   task_name: get_pos          # choose between get_pos and get_morphy
