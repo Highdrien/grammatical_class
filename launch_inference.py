@@ -4,7 +4,6 @@ from src.dataloader.vocabulary import load_dictionary,replace_word2int
 from src.model.get_model import get_model
 
 import os
-import gradio 
 import yaml
 from easydict import EasyDict
 
