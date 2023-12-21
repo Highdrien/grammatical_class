@@ -1,62 +1,53 @@
-name: experiment
-save_experiment: false
+config_metadata: 'Saving time : 12/07/2023, 22:59:45'
+name: 'get_pos_lstm'
+save_experiment: true
 
 # data options
 data:
-  path: data                  # data path
-  language: French            # Language of data
-  sequence_length: 10         # length of sequence
-  pad: <PAD>                  # pad caracter to make padding
-  unk: <UNK>                  # unknow caracter
-  sequence_function: dummy    # function to split sentences to sequences
-  indexes: [1, 3, 5]          # index of information that will be recupered: 
-                                # indexes representation: 
-                                # 0: id       1: word    2: lemma   3: pos   4: unk
-                                # 5: morphy   6: syntax  7: unk     8: unk   9: unk 
-  vocab:
-    path: dictionary          # path to save the vocabulary
-    unk_rate: 0.01            # rate to replace a knowing word by <UNK>
-    save: true                # save the vocabulary or load it from data.voc.path
-    num_words: 33992
+    path: 'data'
+    language: 'English'
+    sequence_length: 10
+    pad: '<PAD>'
+    unk: '<UNK>'
+    sequence_function: 'dummy'
+    indexes: [1, 3, 5]
+    vocab:
+        path: 'dictionary'
+        unk_rate: 0.01
+        save: false
+        num_words: 33992
 
+# task options
 task:
-  task_name: get_pos          # choose between get_pos and get_morphy
-
-  get_pos_info:
-    num_classes: 19           # num classes of POS
-
-  get_morphy_info:
-    not_implemented: Null
+    task_name: 'get_pos'
+    get_pos_info:
+        num_classes: 19
+    get_morphy_info:
+        not_implemented: null
 
 # model options
 model:
-  model_name: lstm            # choose between lstm or bert
-
-  # LSTM Classifier
-  lstm:
-    lstm_hidd_size_1: 64      # first hidden layer size of LSTM layers
-    lstm_hidd_size_2: Null    # second hidden layer size of LSTM layers. Put Null if you want only one LSTM Module
-    fc_hidd_size: []          # hidden layers of fully connected layers. Do not specify the last layers,
-                                # so [] means just one fc layers with output = num_classes
-    embedding_size: 64        # embedding size
-    bidirectional: true       # lstm layers bidirectional
-    activation: relu          # activation function btw layer: relu or sigmoid
-
-  # BERT CLassifier
-  bert:
-    hidd_size: 100
-    pretrained_model_name: bert-base-uncased
+    model_name: 'lstm'
+    lstm:
+        lstm_hidd_size_1: 64
+        lstm_hidd_size_2: null
+        fc_hidd_size: []
+        embedding_size: 64
+        bidirectional: true
+        activation: 'relu'
+    bert:
+        hidd_size: 100
+        pretrained_model_name: 'bert-base-uncased'
 
 # learning options
 learning:
-  loss: crossentropy          # loss
-  optimizer: adam             # optimizer
-  learning_rate: 0.01         # learning rate
-  milesstone: [5, 15]         # gradient decay at epoch 5 and 15
-  gamma: 0.1                  # learning rate will be multiplicate by 0.1 at epochs 5 and 15
-  epochs: 30                  # number of epochs
-  batch_size: 2048            # batch size
-  shuffle: true               # shuffle batches
-  drop_last: true             # drop the last batch
-  save_checkpoint: true       # save model weigth
-  
+    loss: 'crossentropy'
+    optimizer: 'adam'
+    learning_rate: 0.01
+    milesstone: [5, 15]
+    gamma: 0.1
+    epochs: 30
+    batch_size: 64
+    shuffle: true
+    drop_last: true
+    save_checkpoint: true

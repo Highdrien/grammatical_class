@@ -66,6 +66,6 @@ if __name__ == '__main__':
                 ['11', 'louis', 'Number=Sing'],
                 ['12', 'to', '_'],
                 ['13', 'chicago', 'Number=Sing']]
-    ic(sentence)
+    #print(sentence)
     sequences = dummy_sequences(sentence, k=4, pad='<PAD>')
-    ic(sequences)
+    print(sequences)

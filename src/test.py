@@ -6,6 +6,7 @@ from src.model.get_model import get_model
 from src.metrics import compute_metrics
 import matplotlib.pyplot as plt
 from config.config import train_logger, train_step_logger
+import time
 
 def test(config: EasyDict,checkpoint_name='get_pos_lstm_1') -> None:
     # Use gpu or cpu
@@ -16,6 +17,14 @@ def test(config: EasyDict,checkpoint_name='get_pos_lstm_1') -> None:
 
     # Get test data
     test_generator, _ = create_dataloader(config=config, mode='test')
+    #test du dataloader
+    #affiche le premier élément du dataloader, sa shape et son type
+    print("Shape du batch:",next(iter(test_generator))[0].shape)
+    print("First element du batch:",next(iter(test_generator))[0][0])
+    print("Shape of the first element du batch:",next(iter(test_generator))[0][0].shape)
+
+
+
     n_test = len(test_generator)
 
     # Get model
@@ -41,25 +50,24 @@ def test(config: EasyDict,checkpoint_name='get_pos_lstm_1') -> None:
     test_range = tqdm(test_generator)
 
     with torch.no_grad():
-        for x, y_true in test_range:
+        for x,y_true in test_range:
+
+            print("shape of x:",x.shape)
+            print("shape of y_true:",y_true.shape)
             x = x.to(device)
-            y_true = y_true.to(device)
+            #y_true = y_true.to(device)
 
             y_pred = model.forward(x)
             y_pred = y_pred.permute(0, 2, 1)
 
-            loss = criterion(y_pred, y_true)
+            #y_pred back to cpu
+            y_pred=y_pred.cpu()
 
-            test_loss += loss.item()
             test_metrics += compute_metrics(y_pred, y_true, config.task.get_pos_info.num_classes)
 
-            test_range.set_description(f"TEST  -> loss: {loss.item():.4f}")
             test_range.refresh()
 
-    test_loss = test_loss / n_test
     test_metrics = test_metrics / n_test
-
-    print(f"Test Loss: {test_loss:.4f}")
     print(f"Test Metrics: {test_metrics[0]:.4f}")
 
     # Optionally, you can save the test results or generate plots if needed.

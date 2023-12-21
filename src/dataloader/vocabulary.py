@@ -37,7 +37,7 @@ def save_vocab(vocab: Dict[str, int], path: str) -> None:
 
 
 def load_dictionary(filepath: str) -> Dict[str, int]:
-    """ load the vocabulary from filepath """
+    """ load the vocabulary from filepath (its a json file)"""
     with open(filepath, 'r') as f:
         vocab = json.load(f)
         f.close()
@@ -61,4 +61,13 @@ def replace_word2int(data: List[Sequence],
                 word_info[word_index] = vocab[word_info[word_index]]
             else:
                 word_info[word_index] = unk_index
-    
+
+
+if __name__ == '__main__':
+    #load a dictionary
+    vocab = load_dictionary("dictionary/English.json")
+    #define a word to try
+    word = 'the'
+    #get the int associated to the word
+    word_number = vocab[word]
+    print(f"word: {word}  word_number: {word_number}")

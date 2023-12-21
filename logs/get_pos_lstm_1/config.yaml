@@ -47,7 +47,7 @@ learning:
     milesstone: [5, 15]
     gamma: 0.1
     epochs: 30
-    batch_size: 2048
+    batch_size: 64
     shuffle: true
     drop_last: true
     save_checkpoint: true

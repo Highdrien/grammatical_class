@@ -138,7 +138,7 @@ if __name__ == '__main__':
     # x, y = generator.__getitem__(index=1)
     # ic(x)
     # ic(y)
-    dataloader, _ = create_dataloader(config=config, mode='train')
+    dataloader, _ = create_dataloader(config=config, mode='test')
     x, y = next(iter(dataloader))
     ic(x.shape, x.dtype)
     ic(y.shape, y.dtype)

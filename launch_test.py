@@ -6,7 +6,7 @@ from src.test import test
 from config.process_config import process_config
 import os
 
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE" #empêche certaines bugs
 
 
 def load_config(path: str) -> EasyDict:
