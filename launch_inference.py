@@ -4,12 +4,13 @@ from src.dataloader.vocabulary import load_dictionary,replace_word2int
 from src.model.get_model import get_model
 
 import os
+import gradio 
 import yaml
 from easydict import EasyDict
 
 from src.train import train
 from config.process_config import process_config
-import os
+
 
 def load_config(path: str) -> EasyDict:
     stream = open(path, 'r')
@@ -50,7 +51,7 @@ def convert_sentence_to_indexes(sentence,dictionary):
         if word in dictionary:
             indexes.append(dictionary[word])
         else:
-            indexes.append(dictionary['<unk>'])
+            indexes.append(dictionary['<UNK>'])
     return indexes
 
 def inference(sentence,dictionary):
@@ -65,6 +66,10 @@ def inference(sentence,dictionary):
 
     #load model
     model = get_model(config)
+
+    #load weights
+    WEIGHT_PATH="logs/get_pos_lstm_2/checkpoint.pt"
+    model.load_state_dict(torch.load(WEIGHT_PATH))
 
     #find device
     # Use gpu or cpu
@@ -93,10 +98,7 @@ if __name__ == '__main__':
     #load a dictionary
     dictionary = load_dictionary("dictionary/English.json")
     #define a word to try
-    sentence = ['i', 'need', 'a','dog', '.']
-    #convert the word to indexes
-    #indexes = convert_sentence_to_indexes(sentence,dictionary)
-    #print(indexes)
+    sentence = ['i', 'need', 'a','dog', '.','But it aint','gonna','happen','.','I','dont','have','the','money','.']
     #output: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1]
     res=inference(sentence, dictionary)
     print("sentence:",sentence)

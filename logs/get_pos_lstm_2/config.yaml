@@ -1,11 +1,12 @@
-config_metadata: 'Saving time : 12/20/2023, 12:39:59'
+config_metadata: 'Saving time : 12/21/2023, 23:38:47'
+config_metadata: 'Saving time : 12/07/2023, 22:59:45'
 name: 'get_pos_lstm'
-save_experiment: false
+save_experiment: true
 
 # data options
 data:
     path: 'data'
-    language: 'French'
+    language: 'English'
     sequence_length: 10
     pad: '<PAD>'
     unk: '<UNK>'
@@ -14,8 +15,8 @@ data:
     vocab:
         path: 'dictionary'
         unk_rate: 0.01
-        save: true
-        num_words: 67814
+        save: false
+        num_words: 33992
 
 # task options
 task:

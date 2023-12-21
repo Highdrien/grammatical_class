@@ -1,5 +1,5 @@
 config_metadata: 'Saving time : 12/07/2023, 22:59:45'
-name: 'get_pos_lstm'
+name: 'get_pos_lstm_2'
 save_experiment: true
 
 # data options
@@ -47,7 +47,7 @@ learning:
     milesstone: [5, 15]
     gamma: 0.1
     epochs: 30
-    batch_size: 64
+    batch_size: 2048
     shuffle: true
     drop_last: true
     save_checkpoint: true
