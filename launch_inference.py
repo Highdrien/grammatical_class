@@ -6,6 +6,7 @@ from src.model.get_model import get_model
 import os
 import yaml
 from easydict import EasyDict
+from typing import List, Dict
 
 from src.train import train
 from config.process_config import process_config
@@ -73,23 +74,28 @@ def convert_sentence_to_indexes(sentence,dictionary):
             indexes.append(dictionary['<UNK>'])
     return indexes
 
-def inference(sentence,dictionary):
+
+def inference(sentence: List[str],
+              dictionary: Dict[str, int],
+              experiment_path: str
+              ) -> List[str]:
     """ run the model on a sentence
     sentence: list of string
-    model: model
     dictionary: dict[string, int]
+    experiment_path: chemin de l'experience: exemple: logs/get_pos_lstm_2
     return: list of POS labels
     """
     #load config
-    config = load_config(os.path.join('config', 'config.yaml'))
+    config = load_config(os.path.join(experiment_path, 'config.yaml'))
     process_config(config)
 
     #load model
     model = get_model(config)
 
     #load weights
-    WEIGHT_PATH="logs/get_pos_lstm_2/checkpoint.pt"
+    WEIGHT_PATH = os.path.join(experiment_path, 'checkpoint.pt')
     model.load_state_dict(torch.load(WEIGHT_PATH))
+    del WEIGHT_PATH
 
     #find device
     # Use gpu or cpu
