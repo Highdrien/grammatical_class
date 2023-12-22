@@ -35,11 +35,10 @@ def annotate_curve(config: EasyDict):
 def train(config: EasyDict) -> None:
 
     # Use gpu or cpu
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and config.learning.device:
         device = torch.device("cuda")
     else:
         device = torch.device("cpu")
-    device = torch.device("cpu")
     ic(device)
 
     # Get data
@@ -95,12 +94,13 @@ def train(config: EasyDict) -> None:
             y_true = y_true.to(device)
 
             y_pred = model.forward(x)
-            y_pred = y_pred.permute(0, 2, 1)
+            if config.task.task_name == 'pos':
+                y_pred = y_pred.permute(0, 2, 1)
 
             loss = criterion(y_pred, y_true)
 
             train_loss += loss.item() #calcul de la somme des loss sur le batch
-            train_metrics += compute_metrics(y_pred, y_true, config.task.get_pos_info.num_classes) #calcul de la somme des métriques sur le batch
+            # train_metrics += compute_metrics(y_pred, y_true, config.task.get_pos_info.num_classes) #calcul de la somme des métriques sur le batch
 
             loss.backward()
             optimizer.step()
@@ -110,10 +110,10 @@ def train(config: EasyDict) -> None:
             train_range.refresh()
 
         train_loss = train_loss / n_train #calcul de la loss moyenne sur l'epoch
-        train_metrics = train_metrics / n_train #calcul de la métrique moyenne sur l'epoch
+        # train_metrics = train_metrics / n_train #calcul de la métrique moyenne sur l'epoch
 
-        list_train_loss.append(train_loss) #ajout de la loss moyenne sur l'epoch à la liste des loss
-        list_acc_loss.append(train_metrics[0]) #ajout de la métrique moyenne sur l'epoch à la liste des métriques
+        # list_train_loss.append(train_loss) #ajout de la loss moyenne sur l'epoch à la liste des loss
+        # list_acc_loss.append(train_metrics[0]) #ajout de la métrique moyenne sur l'epoch à la liste des métriques
 
 
 
@@ -136,7 +136,8 @@ def train(config: EasyDict) -> None:
                 y_true = y_true.to(device)
 
                 y_pred = model.forward(x)
-                y_pred = y_pred.permute(0, 2, 1)
+                if config.task.task_name == 'pos':
+                    y_pred = y_pred.permute(0, 2, 1)
                     
                 loss = criterion(y_pred, y_true)
 
@@ -144,7 +145,7 @@ def train(config: EasyDict) -> None:
                 # y_pred = torch.nn.functional.softmax(y_pred, dim=1)
                 
                 val_loss += loss.item() #calcul de la loss moyenne sur le batch
-                val_metrics += compute_metrics(y_pred, y_true, config.task.get_pos_info.num_classes) #calcul de la métrique moyenne sur le batch
+                # val_metrics += compute_metrics(y_pred, y_true, config.task.get_pos_info.num_classes) #calcul de la métrique moyenne sur le batch
 
                 val_range.set_description(f"VAL   -> epoch: {epoch} || loss: {loss.item():.4f}")
                 val_range.refresh()
@@ -154,8 +155,8 @@ def train(config: EasyDict) -> None:
         val_loss = val_loss / n_val #calcul de la loss moyenne sur l'epoch
         val_metrics = val_metrics / n_val
         
-        list_val_loss.append(val_loss) #ajout de la loss moyenne sur l'epoch à la liste des loss
-        list_val_metric.append(val_metrics[0])
+        # list_val_loss.append(val_loss) #ajout de la loss moyenne sur l'epoch à la liste des loss
+        # list_val_metric.append(val_metrics[0])
 
         ###################################################################
         # Save Scores in logs                                             #
@@ -169,7 +170,9 @@ def train(config: EasyDict) -> None:
             train_step_logger(path=logging_path, 
                               epoch=epoch, 
                               train_loss=train_loss, 
-                              val_loss=val_loss)
+                              val_loss=val_loss,
+                              train_metrics=[],
+                              val_metrics=[])
             
             if config.learning.save_checkpoint and val_loss < best_val_loss:
                 print('save model weights')

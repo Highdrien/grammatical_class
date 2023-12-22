@@ -37,6 +37,8 @@ def main(options: dict) -> None:
 
     if options['mode'] == 'train':
         config = load_config(options['config_path'])
+        if options['task'] is not None:
+            config.task.task_name = options['task']
         process_config(config)
         ic(config)
         train(config)
@@ -50,9 +52,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     # Options
-    parser.add_argument('--mode', default=None, type=str, help="choose a mode between 'train', 'data'")
-    parser.add_argument('--config_path', default=os.path.join('config', 'config.yaml'), type=str, help="path to config (for training)")
-    parser.add_argument('--path', type=str, help="experiment path (for test, prediction or generate)")
+    parser.add_argument('--mode', '-m', default=None, type=str,
+                        help="choose a mode between 'train', 'data'")
+    parser.add_argument('--config_path', '-c', default=os.path.join('config', 'config.yaml'),
+                        type=str, help="path to config (for training)")
+    parser.add_argument('--path', '-p', type=str,
+                        help="experiment path (for test, prediction or generate)")
+    parser.add_argument('--task', '-t', type=str, default=None,
+                        help="task for model (will overwrite the config) for trainning")
 
     args = parser.parse_args()
     options = vars(args)

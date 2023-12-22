@@ -15,7 +15,7 @@ def analyse_config(config: EasyDict) -> None:
                    value=config.data.sequence_function,
                    name_value='sequence function')
     
-    process_assert(possible=['get_pos'],
+    process_assert(possible=['get_pos', 'get_morphy'],
                    value=config.task.task_name,
                    name_value='task name')
     
@@ -24,7 +24,11 @@ def analyse_config(config: EasyDict) -> None:
                    name_value='model name')
     
     process_assert(possible=['relu', 'sigmoid'],
-                   value=config.model.lstm.activation,
+                   value=config.model.lstm_pos.activation,
+                   name_value='activation function in lstm classifier')
+    
+    process_assert(possible=['relu', 'sigmoid'],
+                   value=config.model.lstm_morphy.activation,
                    name_value='activation function in lstm classifier')
     
     process_assert(possible=['crossentropy'],
@@ -34,6 +38,10 @@ def analyse_config(config: EasyDict) -> None:
     process_assert(possible=['adam'],
                    value=config.learning.optimizer,
                    name_value='optimizer')
+
+    process_assert(possible=['cpu', 'cuda'],
+                   value=config.learning.device,
+                   name_value='device')
     
 
 

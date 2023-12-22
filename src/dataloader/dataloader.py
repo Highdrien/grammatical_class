@@ -26,15 +26,12 @@ class DataGenerator(Dataset):
         self.mode = mode
 
         self.indexes = config.data.indexes
-        ic(self.indexes)
         self.word_index = get_sentences.get_word_index_in_indexes(self.indexes)
-        ic(self.word_index)
         self.task = config.task.task_name
-        ic(self.task)
         self.label_index = self.get_label_index()
-        ic(self.label_index)
         self.num_classes = config.task[f'{self.task}_info'].num_classes
-        ic(self.num_classes)
+
+        self.c = self.num_classes if self.task == 'get_pos' else config.task.get_morphy_info.num_features
 
         data, self.vocab = get_data(cfg=config.data, mode=self.mode)
 
@@ -75,6 +72,7 @@ class DataGenerator(Dataset):
         """
         x = self.x[index]
         y = self.y[index]
+        y = torch.nn.functional.one_hot(y, num_classes=self.c).to(torch.float32)
         return x, y
     
     def get_label_index(self) -> int:
