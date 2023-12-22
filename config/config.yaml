@@ -5,7 +5,7 @@ save_experiment: true
 # data options
 data:
     path: 'data'
-    language: 'English'
+    language: 'French'
     sequence_length: 10
     pad: '<PAD>'
     unk: '<UNK>'
@@ -23,8 +23,8 @@ task:
     get_pos_info:
         num_classes: 19
     get_morphy_info:
-        num_classes: 23
-        not_implemented: null
+        num_classes: 28
+        num_features: 13
 
 # model options
 model:

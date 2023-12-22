@@ -34,21 +34,17 @@ class Morphy(Convert):
             self.label = json.load(f)
             f.close()
         self.num_classes = self.find_num_classes()
+        print(self.num_classes)
     
     def convert(self, label_to_convert: str) -> List[int]:
         label_to_convert = dict(map(lambda x: self.split_x(x=x), label_to_convert.split('|')))
-
-        for key in label_to_convert.keys():
-            if key not in self.label:
-                print(key, label_to_convert)
-                
 
         output = []
         for key, value in self.label.items():
             if key in label_to_convert:
                 output.append(value.index(label_to_convert[key]))
             else:
-                output.append(len(value))
+                output.append(value.index('Not'))
         
         return output
 

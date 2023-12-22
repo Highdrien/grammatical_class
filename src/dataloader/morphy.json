@@ -1,25 +1,175 @@
 {
-    "<PAD>": ["Yes"],
-    "_": ["Yes"],
-    "Case": ["Nom", "Acc", "Gen"],
-    "Number": ["Sing", "Plur"],
-    "Person": ["1", "3", "2"],
-    "PronType": ["Prs", "Art", "Int,Rel", "Dem", "Tot", "Ind", "Int", "Rel", "Neg", "Emp", "Rcp"],
-    "VerbForm": ["Inf", "Part", "Fin", "Ger"],
-    "Degree": ["Sup", "Pos", "Cmp"],
-    "Tense": ["Pres", "Past"],
-    "NumType": ["Card", "Ord", "Frac", "Mult"],
-    "Mood": ["Ind", "Imp", "Sub"],
-    "Gender": ["Neut", "Masc", "Fem"],
-    "Poss": ["Yes"],
-    "Definite": ["Def", "Ind"],
-    "NumForm": ["Word", "Digit", "Combi", "Roman"],
-    "Voice": ["Pass"],
-    "Foreign": ["Yes"],
-    "ExtPos": ["ADV", "ADP", "SCONJ", "CCONJ"],
-    "Typo": ["Yes"],
-    "Style": ["Expr", "Coll", "Vrnc"],
-    "Reflex": ["Yes"],
-    "Abbr": ["Yes"],
-    "Polarity": ["Neg"]
+ "_": [
+  "Not",
+  "Yes"
+ ],
+ "<PAD>": [
+  "Not",
+  "Yes"
+ ],
+ "Emph": [
+  "Not",
+  "No",
+  "Yes"
+ ],
+ "Gender": [
+  "Not",
+  "Fem",
+  "Masc",
+  "Neut",
+  "Fem,Masc"
+ ],
+ "Number": [
+  "Not",
+  "Sing",
+  "Plur"
+ ],
+ "Person": [
+  "Not",
+  "3",
+  "1",
+  "2"
+ ],
+ "PronType": [
+  "Not",
+  "Prs",
+  "Dem",
+  "Ind",
+  "Int",
+  "Rel",
+  "Art",
+  "Emp",
+  "Tot",
+  "Neg",
+  "Exc",
+  "Int,Rel",
+  "Prs,Rel",
+  "Rcp"
+ ],
+ "Typo": [
+  "Not",
+  "Yes"
+ ],
+ "ExtPos": [
+  "Not",
+  "VERB",
+  "PROPN",
+  "NOUN",
+  "ADV",
+  "ADP",
+  "ADJ",
+  "SCONJ",
+  "DET",
+  "INTJ",
+  "PRON",
+  "NUM",
+  "CCONJ"
+ ],
+ "Tense": [
+  "Not",
+  "Pres",
+  "Imp",
+  "Past",
+  "Fut"
+ ],
+ "VerbForm": [
+  "Not",
+  "Ger",
+  "Fin",
+  "Part",
+  "Inf"
+ ],
+ "NumType": [
+  "Not",
+  "Ord",
+  "Card",
+  "Mult",
+  "Frac"
+ ],
+ "Mood": [
+  "Not",
+  "Ind",
+  "Imp",
+  "Sub",
+  "Cnd"
+ ],
+ "Poss": [
+  "Not",
+  "Yes"
+ ],
+ "Case": [
+  "Not",
+  "Acc",
+  "Nom",
+  "Gen"
+ ],
+ "Reflex": [
+  "Not",
+  "Yes"
+ ],
+ "Polarity": [
+  "Not",
+  "Neg",
+  "Pos"
+ ],
+ "Degree": [
+  "Not",
+  "Cmp",
+  "Pos",
+  "Sup"
+ ],
+ "Style": [
+  "Not",
+  "Vrnc",
+  "Expr",
+  "Arch",
+  "Slng",
+  "Coll"
+ ],
+ "Number[psor]": [
+  "Not",
+  "Plur",
+  "Sing"
+ ],
+ "Person[psor]": [
+  "Not",
+  "1",
+  "3",
+  "2"
+ ],
+ "NumForm": [
+  "Not",
+  "Roman",
+  "Word",
+  "Combi",
+  "Digit"
+ ],
+ "Abbr": [
+  "Not",
+  "Yes"
+ ],
+ "Voice": [
+  "Not",
+  "Pass",
+  "Act"
+ ],
+ "AdpType": [
+  "Not",
+  "Prep"
+ ],
+ "Foreign": [
+  "Not",
+  "Yes"
+ ],
+ "Definite": [
+  "Not",
+  "Ind",
+  "Def"
+ ],
+ "Morph": [
+  "Not",
+  "VFin",
+  "VInf",
+  "VPar"
+ ]
 }

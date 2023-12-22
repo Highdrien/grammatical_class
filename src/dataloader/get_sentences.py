@@ -2,7 +2,7 @@
 
 import os
 from typing import List, Union
-from icecream import ic
+
 
 Word_Info = List[str]       # example: ['6', 'flights', 'flight', 'NOUN', '_', 'Number=Plur', '1', 'obj', '_', '_']
 Sentence = List[Word_Info]  # list of word info
@@ -15,6 +15,7 @@ def get_sentences(files: Union[str, List[str]], indexes: List[int]) -> List[Sent
     0: id       1: word    2: lemma   3: pos   4: unk
     5: morphy   6: syntax  7: unk     8: unk   9: unk 
     """
+    #TODO: mettre un *arg pour faire plus propre
     if type(files) != list:
         files = [files]
     data = []
@@ -72,32 +73,50 @@ def get_file_for_mode(folder_list: List[str], mode: str) -> List[str]:
 def get_word_index_in_indexes(indexes: List[int]) -> int:
     assert 1 in indexes, f"Error, 1 is not in indexes (1: word)"
     return indexes.index(1)
+
+
+def get_all_label():
+    from tqdm import tqdm
+    from icecream import ic 
+    import json
+
+    data_path = os.path.join(os.getcwd(), 'data')
+
+    all_label = []
+    for language in tqdm(['English', 'French'], desc='get all data'):
+        for mode in ['train', 'val', 'test']:
+            folders = get_foldersname_from_language(datapath=data_path, language=language)
+            files = get_file_for_mode(folder_list=folders, mode=mode)
+            data = get_sentences(files=files, indexes=[1, 5])
+            for sequence in data:
+                all_label += list(map(lambda x: x[1], sequence))
     
+    print(all_label[:10])
+    print(len(all_label))
+
+
+    not_value = 'Not'
+    label_dict = {'_': [not_value, 'Yes'], '<PAD>': [not_value, 'Yes']}
+    all_label = list(set(all_label))
+
+    for label in tqdm(all_label, desc='get all label'):
+        if label != '_':
+            labels = label.split('|')
+            labels = list(map(lambda x: x.split('='), labels))
+            for key, value in labels:
+                if key not in label_dict:
+                    label_dict[key] = [not_value, value]
+                else:
+                    if value not in label_dict[key]:
+                        label_dict[key].append(value) 
+    
+    ic(label_dict)
+    with open(file='morphy2.json', mode='w') as f:
+        json.dump(label_dict, f, indent=True)
+        f.close()
+    print('Done')
+
 
 if __name__ == '__main__':
-    data_path = os.path.join('..', '..', 'data') 
-    #get current file path
-    data_path = os.path.join(os.getcwd(), 'data')
-    file_path = os.path.join(data_path, 'UD_English-Atis', 'en_atis-ud-train.conllu')
-    indexes = [0, 1, 5]
-    data = get_sentences(files=file_path, indexes=indexes)
-    #ic('sentences numbers:', len(data))
-    #ic('words numbers in the first setences:', len(data[0]))
-    #ic('information numbers in the word:', len(data[0][0]))
-
-    print('sentences numbers:', len(data))
-
-    folders = get_foldersname_from_language(datapath=data_path, language='English')
-    #print('folders:', folders)
-    #ic(folders)
-    files_train = get_file_for_mode(folder_list=folders, mode='train')
-    #ic(files_train)
-    #print('files_train:', files_train)
-
-    data = get_sentences(files=files_train, indexes=[0, 1, 5])
-    #get all features of the first word of the first sentence
-    data = get_sentences(files=files_train, indexes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-    print(data[0])
-    #ic(data[30])
-
+    # get_all_label()
     pass

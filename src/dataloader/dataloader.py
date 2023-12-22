@@ -65,12 +65,13 @@ class DataGenerator(Dataset):
         
         if task == get_morphy:
             shape x: (B, K)
-            shape y: (B, K, C, N)
+            shape y: (B, K, C)
 
             where:  B: batch size
                     K: sequence length
                     C: number of classes
-                    N: number of possibilites of classes
+        
+        !!! Attention : y is index matrix not one hot matrix !!!
         """
         x = self.x[index]
         y = self.y[index]
@@ -149,9 +150,11 @@ if __name__ == '__main__':
     import yaml
     from icecream import ic 
     config = EasyDict(yaml.safe_load(open('config/config.yaml', 'r')))
-    ic(config)
-    config.task.task_name = 'get_morphy'
+
     dataloader, _ = create_dataloader(config=config, mode='test')
     x, y = next(iter(dataloader))
     ic(x.shape, x.dtype)
     ic(y.shape, y.dtype)
+
+    ic(x[0])
+    ic(y[0])
