@@ -5,11 +5,11 @@ from icecream import ic
 
 
 class MultiLabelLSTM(nn.Module):
-    def __init__(self, embedding_dim, lstm_1, lstm_2, max_classes):
+    def __init__(self, vocab_size, embedding_dim, lstm_1, lstm_2, max_classes):
         super(MultiLabelLSTM, self).__init__()
 
         # Première partie du modèle - Prédiction du nombre de classes
-        self.embedding = nn.Embedding(max_classes, embedding_dim)
+        self.embedding = nn.Embedding(vocab_size, embedding_dim)
         self.lstm1 = nn.LSTM(embedding_dim, lstm_1, batch_first=True)
         self.num_classes_output = nn.Linear(lstm_1, 1)
 
@@ -45,6 +45,7 @@ class MultiLabelLSTM(nn.Module):
 if __name__ == '__main__':
 
     B = 10      # batch size
+    V = 3000    # vocab size
     K = 20      # sequence length
     C = 10      # num classes
     E = 32      # embedding dim
@@ -52,7 +53,7 @@ if __name__ == '__main__':
     L2 = 64     # lstm dim 2
 
 
-    X = torch.randint(0, C, size=(B, K))
+    X = torch.randint(0, V, size=(B, K))
     y1 = torch.randint(1, 11, size=(B, 1)) # Nombre de classes
     y2 = torch.randint(0, C, size=(B, K))  # Classes correspondantes
 
@@ -60,9 +61,12 @@ if __name__ == '__main__':
     ic(y1.shape)
     ic(y2.shape)
 
-    model = MultiLabelLSTM(embedding_dim=E, lstm_1=32, lstm_2=64, max_classes=C)
+    model = MultiLabelLSTM(vocab_size=V, embedding_dim=E, lstm_1=L1, lstm_2=L2, max_classes=C)
 
     num_classes_pred, classes_pred = model(X, y1)
+
+    ic(num_classes_pred.shape)
+    ic(classes_pred.shape)
 
     
 

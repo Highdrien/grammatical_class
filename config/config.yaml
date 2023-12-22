@@ -23,6 +23,7 @@ task:
     get_pos_info:
         num_classes: 19
     get_morphy_info:
+        num_classes: 23
         not_implemented: null
 
 # model options

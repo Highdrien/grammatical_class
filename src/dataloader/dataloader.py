@@ -4,13 +4,15 @@ from typing import List, Tuple, Dict
 
 import torch
 from torch.utils.data import Dataset, DataLoader
-# import torch.nn.functional as F
+import sys
+sys.path.append(os.path.join(sys.path[0], '..'))
+sys.path.append(os.path.join(sys.path[0], '..', '..'))
 
-import src.dataloader.get_sentences as get_sentences
-import src.dataloader.get_sequences as get_sequences
-import src.dataloader.vocabulary as vocabulary
-import src.dataloader.convert_label as convert_label
-import src.dataloader.get_word_and_label as get_word_and_label
+from src.dataloader import get_sentences
+from src.dataloader import get_sequences
+from src.dataloader import vocabulary
+from src.dataloader import convert_label
+from src.dataloader import get_word_and_label
 
 
 Word_Info = List[str]       # example: ['6', 'flights', 'flight', 'NOUN', '_', 'Number=Plur', '1', 'obj', '_', '_']
@@ -24,16 +26,24 @@ class DataGenerator(Dataset):
         self.mode = mode
 
         self.indexes = config.data.indexes
+        ic(self.indexes)
         self.word_index = get_sentences.get_word_index_in_indexes(self.indexes)
+        ic(self.word_index)
         self.task = config.task.task_name
+        ic(self.task)
         self.label_index = self.get_label_index()
-        self.num_classes = 19 if self.task == 'get_pos' else None
+        ic(self.label_index)
+        self.num_classes = config.task[f'{self.task}_info'].num_classes
+        ic(self.num_classes)
 
         data, self.vocab = get_data(cfg=config.data, mode=self.mode)
+
+        convert = convert_label.POS() if self.task == 'get_pos' else convert_label.Morphy()
+
         self.x, self.y = get_word_and_label.split_data_to_word_label(data=data,
                                                                      word_index=self.word_index,
                                                                      label_index=self.label_index,
-                                                                     convert_label=convert_label.get_convert_function(task=self.task),
+                                                                     convert_label=convert,
                                                                      del_data_after=True)
         
         self.x = torch.tensor(self.x).to(torch.long)
@@ -52,12 +62,17 @@ class DataGenerator(Dataset):
         if task == get_pos:
             shape x: (B, K)
             shape y: (B, K)
+        
+        if task == get_morphy:
+            shape x: (B, K)
+            shape y: (B, K, C, N)
 
             where:  B: batch size
                     K: sequence length
+                    C: number of classes
+                    N: number of possibilites of classes
         """
         x = self.x[index]
-        # y = F.one_hot(self.y[index], num_classes=self.num_classes).to(torch.float32)
         y = self.y[index]
         return x, y
     
@@ -67,8 +82,8 @@ class DataGenerator(Dataset):
             assert 3 in self.indexes, f"Error, if task=get_pos, 3 must be in config.data.indexes"
             return self.indexes.index(3)
         if self.task == 'get_morphy':
-            assert 5 in self.indexes, f"Error, if task=get_morphy, 3 must be in config.data.indexes"
-            raise self.indexes.index(5)
+            assert 5 in self.indexes, f"Error, if task=get_morphy, 5 must be in config.data.indexes"
+            return self.indexes.index(5)
     
     def get_vocab(self) -> Dict[str, int]:
         return self.vocab
@@ -134,10 +149,8 @@ if __name__ == '__main__':
     import yaml
     from icecream import ic 
     config = EasyDict(yaml.safe_load(open('config/config.yaml', 'r')))
-    # generator = DataGenerator(config=config, mode='val')
-    # x, y = generator.__getitem__(index=1)
-    # ic(x)
-    # ic(y)
+    ic(config)
+    config.task.task_name = 'get_morphy'
     dataloader, _ = create_dataloader(config=config, mode='test')
     x, y = next(iter(dataloader))
     ic(x.shape, x.dtype)

@@ -1,5 +1,7 @@
 from typing import List, Callable, Tuple
 
+from src.dataloader.convert_label import Convert
+
 Word_Info = List[str]       # example: ['6', 'flights', 'flight', 'NOUN', '_', 'Number=Plur', '1', 'obj', '_', '_']
 Sequence = List[Word_Info]  # list of word info with the same length
 
@@ -7,7 +9,7 @@ Sequence = List[Word_Info]  # list of word info with the same length
 def split_data_to_word_label(data: List[Sequence],
                              word_index: int,
                              label_index: int,
-                             convert_label: Callable[[str], int],
+                             convert_label: Convert,
                              del_data_after: bool
                              ) -> Tuple[List[List[int]], List[List[int]]]:
     """ split data to have word x and label y
@@ -20,7 +22,7 @@ def split_data_to_word_label(data: List[Sequence],
         seq_x, seq_y = [], []
         for word_info in sequence:
             seq_x.append(word_info[word_index])
-            seq_y.append(convert_label(word_info[label_index]))
+            seq_y.append(convert_label.convert(label_to_convert=word_info[label_index]))
         x.append(seq_x)
         y.append(seq_y)
 
