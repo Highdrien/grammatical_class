@@ -20,6 +20,7 @@ class MultiLabelLSTM(nn.Module):
     def forward(self, input_sequence, num_classes_input):
         # Première partie du modèle
         embedded = self.embedding(input_sequence)
+        
         ic(embedded.shape)
         lstm_out1, _ = self.lstm1(embedded)
         ic(lstm_out1.shape)
@@ -47,23 +48,22 @@ if __name__ == '__main__':
     B = 10      # batch size
     V = 3000    # vocab size
     K = 20      # sequence length
-    C = 10      # num classes
+    C = 28      # num classes
+    N = 13      # classes possibility 
     E = 32      # embedding dim
     L1 = 32     # lstm dim
     L2 = 64     # lstm dim 2
 
 
     X = torch.randint(0, V, size=(B, K))
-    y1 = torch.randint(1, 11, size=(B, 1)) # Nombre de classes
-    y2 = torch.randint(0, C, size=(B, K))  # Classes correspondantes
+    y2 = torch.randint(0, N, size=(B, K, C))  # Classes correspondantes
 
     ic(X.shape)
-    ic(y1.shape)
     ic(y2.shape)
 
     model = MultiLabelLSTM(vocab_size=V, embedding_dim=E, lstm_1=L1, lstm_2=L2, max_classes=C)
 
-    num_classes_pred, classes_pred = model(X, y1)
+    num_classes_pred, classes_pred = model(X)
 
     ic(num_classes_pred.shape)
     ic(classes_pred.shape)

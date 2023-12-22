@@ -19,7 +19,7 @@ def analyse_config(config: EasyDict) -> None:
                    value=config.task.task_name,
                    name_value='task name')
     
-    process_assert(possible=['lstm','bert'],
+    process_assert(possible=['lstm', 'bert'],
                    value=config.model.model_name,
                    name_value='model name')
     
