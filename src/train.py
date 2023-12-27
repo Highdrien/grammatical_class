@@ -13,6 +13,21 @@ from config.config import train_logger, train_step_logger
 from src.metrics import compute_metrics, accuracy_without_pad
 import matplotlib.pyplot as plt
 
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class CrossEntropyLossOneHot(nn.Module):
+    def __init__(self,reduction='mean'):
+        super(CrossEntropyLossOneHot, self).__init__()
+        self.cross_entropy_loss = nn.CrossEntropyLoss(reduction=reduction)
+
+    def forward(self, input, target):
+        # Convert one-hot vectors to indices
+        target_indices = torch.argmax(target, dim=2)
+        #permutation des axes pour que la shape de y_pred et y_true soit la même
+        input=input.permute(0,2,1)
+        return self.cross_entropy_loss(input, target_indices)
 
 
 def annotate_curve(config: EasyDict):
@@ -56,7 +71,9 @@ def train(config: EasyDict) -> None:
     # Loss
     assert config.learning.loss == 'crossentropy', NotImplementedError(
         f"The loss '{config.learning.loss}' was not implemented. Only 'crossentropy' is inplemented")
-    criterion = torch.nn.CrossEntropyLoss(reduction='mean')
+    criterion = CrossEntropyLossOneHot()
+    #torch.nn.BCEWithLogitsLoss(reduction='mean')
+    #torch.nn.CrossEntropyLoss(reduction='mean')
 
     # Optimizer and Scheduler
     assert config.learning.optimizer == 'adam', NotImplementedError(
@@ -95,10 +112,19 @@ def train(config: EasyDict) -> None:
 
             y_pred = model.forward(x)
 
-            if config.task.task_name == 'pos':
-                y_pred = y_pred.permute(0, 2, 1)
+            #if config.task.task_name == 'pos':
+            #    y_pred = y_pred.permute(0, 2, 1)
 
-            loss = criterion(y_pred, y_true)
+
+
+            #print("SHAPES ypred:", y_pred.shape) #Shape: (batch_size, max_len, num_classes)
+            #print("SHAPES ytrue:", y_true.shape) #Shape: (batch_size, max_len, num_classes)
+
+            
+
+            loss = criterion(y_pred, y_true) #calcul de la loss sur le batch
+
+          
 
             train_loss += loss.item() #calcul de la somme des loss sur le batch
             train_metrics += compute_metrics(y_pred, y_true, config.task.get_pos_info.num_classes) #calcul de la somme des métriques sur le batch
@@ -114,7 +140,7 @@ def train(config: EasyDict) -> None:
         train_metrics = train_metrics / n_train #calcul de la métrique moyenne sur l'epoch
 
         list_train_loss.append(train_loss) #ajout de la loss moyenne sur l'epoch à la liste des loss
-        list_acc_loss.append(train_metrics[0]) #ajout de la métrique moyenne sur l'epoch à la liste des métriques
+        list_acc_loss.append(train_metrics) #ajout de la métrique moyenne sur l'epoch à la liste des métriques
 
 
 
@@ -154,7 +180,7 @@ def train(config: EasyDict) -> None:
         val_metrics = val_metrics / n_val
         
         list_val_loss.append(val_loss) #ajout de la loss moyenne sur l'epoch à la liste des loss
-        list_val_metric.append(val_metrics[0])
+        list_val_metric.append(val_metrics)
 
         ###################################################################
         # Save Scores in logs                                             #

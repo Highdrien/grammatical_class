@@ -123,9 +123,11 @@ def inference(sentence: List[str],
 if __name__ == '__main__':
     #load a dictionary
     dictionary = load_dictionary("dictionary/English.json")
-    experiment_path = "logs/get_pos_lstm_5"
-    #define a word to try
+    experiment_path = "logs/get_pos_lstm_3"
+    #sentence in english
     sentence = ['i', 'need', 'a','dog', '.','But it aint','gonna','happen','.','I','dont','have','the','money','.']
+    #sentence in french
+    #sentence = ['je', 'veux', 'un','chien', '.','Mais ça','narrivera','pas','.','Je','nai','pas','dargent','.']
     #output: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1]
     res=inference(sentence, dictionary, experiment_path)
     print("sentence:",sentence)
