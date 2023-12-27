@@ -123,9 +123,10 @@ def inference(sentence: List[str],
 if __name__ == '__main__':
     #load a dictionary
     dictionary = load_dictionary("dictionary/English.json")
+    experiment_path = "logs/get_pos_lstm_5"
     #define a word to try
     sentence = ['i', 'need', 'a','dog', '.','But it aint','gonna','happen','.','I','dont','have','the','money','.']
     #output: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1]
-    res=inference(sentence, dictionary)
+    res=inference(sentence, dictionary, experiment_path)
     print("sentence:",sentence)
     print("POS:",res)
