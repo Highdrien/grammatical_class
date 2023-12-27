@@ -58,21 +58,23 @@ class DataGenerator(Dataset):
         """ return word: x and label: y
         if task == get_pos:
             shape x: (B, K)
-            shape y: (B, K)
+            shape y: (B, K)             # not a one hot
         
         if task == get_morphy:
             shape x: (B, K)
-            shape y: (B, K, C)
+            shape y: (B, K, C, N)       # one hot
 
             where:  B: batch size
                     K: sequence length
-                    C: number of classes
-        
-        !!! Attention : y is index matrix not one hot matrix !!!
+                    C: number of classes (=28)
+                    N: number of possibility by class (=13)
         """
         x = self.x[index]
         y = self.y[index]
-        y = torch.nn.functional.one_hot(y, num_classes=self.c).to(torch.float32)
+
+        if self.task == 'get_morphy':
+            y = torch.nn.functional.one_hot(y, num_classes=self.c).to(torch.float32)
+        
         return x, y
     
     def get_label_index(self) -> int:
@@ -149,10 +151,11 @@ if __name__ == '__main__':
     from icecream import ic 
     config = EasyDict(yaml.safe_load(open('config/config.yaml', 'r')))
 
+    config.task.task_name = 'get_morphy'
     dataloader, _ = create_dataloader(config=config, mode='test')
     x, y = next(iter(dataloader))
     ic(x.shape, x.dtype)
     ic(y.shape, y.dtype)
 
-    ic(x[0])
-    ic(y[0])
+    # ic(x[0])
+    # ic(y[0])

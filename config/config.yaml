@@ -4,7 +4,7 @@ save_experiment: true
 # data options
 data:
     path: data
-    language: English
+    language: French
     sequence_length: 10
     pad: <PAD>
     unk: <UNK>
@@ -61,3 +61,6 @@ learning:
     drop_last: true
     save_checkpoint: true
     device: cuda
+
+metrics:
+    acc: true
