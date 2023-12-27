@@ -4,7 +4,7 @@ from easydict import EasyDict
 def change_name(config: EasyDict) -> None:
     task_name = config.task.task_name
     model_name = config.model.model_name
-    config.name = f"{task_name}_{model_name}" 
+    config.name = f"{task_name}_{model_name}_{config.data.language}" 
 
 
 def analyse_config(config: EasyDict) -> None:
