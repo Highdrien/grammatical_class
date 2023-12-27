@@ -34,9 +34,6 @@ def save_vocab(vocab: Dict[str, int], path: str) -> None:
     with open(path, 'w', encoding='utf8') as f:
         json.dump(vocab, f)
         f.close()
-    print(vocab)
-    print(f'vocabulary was save in {path}')
-    exit()
 
 
 def load_dictionary(filepath: str) -> Dict[str, int]:

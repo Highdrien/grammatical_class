@@ -9,6 +9,7 @@ from icecream import ic
 from src.dataloader.dataloader import create_dataloader
 from src.model.get_model import get_model
 from config.config import train_logger, train_step_logger
+from utils.plot_learning_curves import save_learning_curves
 
 from src.metrics import compute_metrics, accuracy_without_pad
 import matplotlib.pyplot as plt
@@ -16,6 +17,7 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 
 class CrossEntropyLossOneHot(nn.Module):
     def __init__(self,reduction='mean'):
@@ -94,7 +96,7 @@ def train(config: EasyDict) -> None:
     start_time = time.time()
 
     list_train_loss = [] #liste des loss moyennes sur les epochs (train)
-    list_acc_loss = []  #liste des métriques moyennes sur les epochs (train)
+    list_train_metric = []  #liste des métriques moyennes sur les epochs (train)
     list_val_loss = [] #liste des loss moyennes sur les epochs (validation)
     list_val_metric = [] #liste des métriques moyennes sur les epochs (validation)
 
@@ -140,7 +142,7 @@ def train(config: EasyDict) -> None:
         train_metrics = train_metrics / n_train #calcul de la métrique moyenne sur l'epoch
 
         list_train_loss.append(train_loss) #ajout de la loss moyenne sur l'epoch à la liste des loss
-        list_acc_loss.append(train_metrics) #ajout de la métrique moyenne sur l'epoch à la liste des métriques
+        list_train_metric.append(train_metrics) #ajout de la métrique moyenne sur l'epoch à la liste des métriques
 
 
 
@@ -206,7 +208,9 @@ def train(config: EasyDict) -> None:
 
     stop_time = time.time()
     print(f"training time: {stop_time - start_time}secondes for {config.learning.epochs} epochs")
-    #plot loss
+    
+    if save_experiment:
+        save_learning_curves(path=logging_path)
 
     annotation=annotate_curve(config) #création de la str d'annotation
     print("ANNOTATION", annotation)
@@ -221,7 +225,7 @@ def train(config: EasyDict) -> None:
 
     #plot accuracy
     plt.figure()
-    plt.plot(list_acc_loss, label='train accuracy')
+    plt.plot(list_train_metric, label='train accuracy')
     plt.plot(list_val_metric, label='val accuracy')
     plt.annotate(annotation, xy=(0.5, 0.5), xycoords='axes fraction')
     plt.legend()
