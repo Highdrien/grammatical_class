@@ -34,7 +34,6 @@ class Morphy(Convert):
             self.label = json.load(f)
             f.close()
         self.num_classes = self.find_num_classes()
-        print(self.num_classes)
     
     def convert(self, label_to_convert: str) -> List[int]:
         label_to_convert = dict(map(lambda x: self.split_x(x=x), label_to_convert.split('|')))
