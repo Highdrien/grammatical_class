@@ -12,7 +12,7 @@ from src.dataloader.dataloader import create_dataloader
 from src.model.get_model import get_model
 from config.config import train_logger, train_step_logger
 from utils.plot_learning_curves import save_learning_curves
-from src.metrics import POS_Metrics
+from src.metrics import get_metrics
 
 
 def train(config: EasyDict) -> None:
@@ -46,7 +46,7 @@ def train(config: EasyDict) -> None:
     scheduler = MultiStepLR(optimizer, milestones=config.learning.milesstone, gamma=config.learning.gamma)
 
     # Metrics
-    metrics = POS_Metrics(config=config, device=device)
+    metrics = get_metrics(config=config, device=device)
     metrics_name = metrics.get_metrics_name()
     ic(metrics_name)
 
