@@ -6,7 +6,6 @@ from easydict import EasyDict
 from torchmetrics import Accuracy
 
 
-
 class Metrics:
     def __init__(self, config: EasyDict) -> None:
         if 'metrics' in config.keys():
@@ -63,15 +62,15 @@ class POS_Metrics(Metrics):
             metrics_name += ['acc micro', 'acc macro']
         return metrics_name
 
+
 class MOR_Metrics(Metrics):
     def __init__(self, config: EasyDict) -> None:
         super().__init__(config)
 
-        sequence_lenght = config.data.sequence_length
+        self.sequence_length = config.data.sequence_length
         num_classes = config.task.get_morphy_info.num_classes
-        # num_features = config.task.get_morphy_info.num_features
 
-        self.elt = sequence_lenght * num_classes
+        self.elt = self.sequence_length * num_classes
     
     def compute(self, y_true: torch.Tensor, y_pred: torch.Tensor) -> np.ndarray:
         """ compute metrics
@@ -82,10 +81,16 @@ class MOR_Metrics(Metrics):
         y_true_argmax = torch.argmax(y_true, dim=-1)
         metrics_value = []
 
+        eg = (y_pred_argmax == y_true_argmax)
+
         if 'acc' in self.metrics_name:
-            eg = (y_pred_argmax == y_true_argmax)
             acc = eg.sum().item() / (y_true.shape[0] * self.elt)
             metrics_value.append(acc)
+        
+        if 'allgood' in self.metrics_name:
+            eg_sum = torch.sum(eg, dim=-1)
+            all_good = torch.sum(eg_sum == C_mor).item() / (y_true.shape[0] * self.sequence_length)
+            metrics_value.append(all_good)
         
         return np.array(metrics_value)
     
@@ -93,6 +98,9 @@ class MOR_Metrics(Metrics):
         metrics_name = []
         if 'acc' in self.metrics_name:
             metrics_name += ['acc micro']
+        if 'allgood' in self.metrics_name:
+            metrics_name += ['allgood']
+        
         return metrics_name
 
 
@@ -117,19 +125,20 @@ if __name__ == "__main__":
     C_mor = 28  # num classes for morphy
     N_mor = 13  # num features for morphy
 
-    # # mode: get_pos
-    # x = torch.randint(0, V, (B, K))
-    # y_pred = torch.rand((B, K, C_pos))
-    # y_true = torch.randint(0, C_pos, (B, K))
+    # mode: get_pos
+    x = torch.randint(0, V, (B, K))
+    y_pred = torch.rand((B, K, C_pos))
+    y_true = torch.randint(0, C_pos, (B, K))
 
-    # ic(x.shape, x.dtype)
-    # ic(y_pred.shape, y_pred.dtype)
-    # ic(y_true.shape, y_true.dtype)
+    ic(x.shape, x.dtype)
+    ic(y_pred.shape, y_pred.dtype)
+    ic(y_true.shape, y_true.dtype)
     
 
-    # metric = POS_Metrics(config=config)
-    # metrics_value = metric.compute(y_pred=y_pred, y_true=y_true)
-    # ic(metrics_value)
+    metrics = POS_Metrics(config=config)
+    ic(metrics.get_metrics_name())
+    metrics_value = metrics.compute(y_pred=y_pred, y_true=y_true)
+    ic(metrics_value)
 
     ## mode: get_morphy
     x = torch.randint(0, V, (B, K))
@@ -141,8 +150,9 @@ if __name__ == "__main__":
     ic(y_pred.shape, y_pred.dtype)
     ic(y_true.shape, y_true.dtype)
 
-    metric = MOR_Metrics(config=config)
-    metrics_value = metric.compute(y_pred=y_pred, y_true=y_true)
+    metrics = MOR_Metrics(config=config)
+    ic(metrics.get_metrics_name())
+    metrics_value = metrics.compute(y_pred=y_pred, y_true=y_true)
     ic(metrics_value)
 
 
