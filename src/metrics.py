@@ -12,6 +12,9 @@ class Metrics:
             self.metrics_name = list(filter(lambda x: config.metrics[x], config.metrics))
         else:
             self.metrics_name = []
+
+        task = config.task.task_name
+        self.num_classes = config.task[f'{task}_info'].num_classes
         
         self.metric = {}
 
@@ -27,11 +30,9 @@ class POS_Metrics(Metrics):
     def __init__(self, config: EasyDict, device: torch.device=None) -> None:
         super().__init__(config)
 
-        num_classes = config.task.get_pos_info.num_classes
-
         self.metric : dict[str, Any] = {
-            'acc micro': Accuracy(num_classes=num_classes, average='micro', task='multiclass'),
-            'acc macro': Accuracy(num_classes=num_classes, average='macro', task='multiclass')
+            'acc micro': Accuracy(num_classes=self.num_classes, average='micro', task='multiclass'),
+            'acc macro': Accuracy(num_classes=self.num_classes, average='macro', task='multiclass')
         }
         if device is not None:
             for key, value in self.metric.items():
@@ -89,7 +90,7 @@ class MOR_Metrics(Metrics):
         
         if 'allgood' in self.metrics_name:
             eg_sum = torch.sum(eg, dim=-1)
-            all_good = torch.sum(eg_sum == C_mor).item() / (y_true.shape[0] * self.sequence_length)
+            all_good = torch.sum(eg_sum == self.num_classes).item() / (y_true.shape[0] * self.sequence_length)
             metrics_value.append(all_good)
         
         return np.array(metrics_value)
