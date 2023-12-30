@@ -38,8 +38,8 @@ def train(config: EasyDict) -> None:
     ic(model.get_number_parameters())
     
     # Loss
-    criterion = torch.nn.CrossEntropyLoss(reduction='mean')
-    #criterion=CrossEntropyLossOneHotMorph(reduction='mean')
+    #criterion = torch.nn.CrossEntropyLoss(reduction='mean')
+    criterion=CrossEntropyLossOneHotMorph(reduction='mean')
 
     # Optimizer and Scheduler
     assert config.learning.optimizer == 'adam', NotImplementedError(

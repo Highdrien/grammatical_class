@@ -41,7 +41,7 @@ model:
     # model to get MORPHY with LSTM
     lstm_morphy:
         lstm_hidd_size_1: 64
-        lstm_hidd_size_2: null
+        lstm_hidd_size_2: 64
         fc_hidd_size: [256]
         embedding_size: 64
         bidirectional: true
