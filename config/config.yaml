@@ -64,4 +64,4 @@ learning:
 
 metrics:
     acc: true
-    allgood: true
+    allgood: false

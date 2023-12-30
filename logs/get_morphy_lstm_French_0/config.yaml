@@ -1,4 +1,4 @@
-config_metadata: 'Saving time : 12/28/2023, 23:04:24'
+config_metadata: 'Saving time : 12/30/2023, 21:29:35'
 name: 'get_morphy_lstm_French'
 save_experiment: true
 
@@ -51,7 +51,7 @@ learning:
     learning_rate: 0.01
     milesstone: [5, 15]
     gamma: 0.1
-    epochs: 20
+    epochs: 30
     batch_size: 2048
     shuffle: true
     drop_last: true
@@ -61,3 +61,4 @@ learning:
 # metrics options
 metrics:
     acc: true
+    allgood: false

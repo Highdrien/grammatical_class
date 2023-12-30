@@ -39,7 +39,7 @@ def train(config: EasyDict) -> None:
     
     # Loss
     criterion = torch.nn.CrossEntropyLoss(reduction='mean')
-    criterion=CrossEntropyLossOneHotMorph(reduction='mean')
+    #criterion=CrossEntropyLossOneHotMorph(reduction='mean')
 
     # Optimizer and Scheduler
     assert config.learning.optimizer == 'adam', NotImplementedError(

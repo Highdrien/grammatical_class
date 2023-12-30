@@ -1,5 +1,6 @@
 
 import torch
+import numpy as np
 from src.dataloader.vocabulary import load_dictionary,replace_word2int
 from src.model.get_model import get_model
 
@@ -19,13 +20,10 @@ def load_config(path: str) -> EasyDict:
     return EasyDict(yaml.safe_load(stream))
 
 
-def load_dictionary(path):
+def load_dictionary_morph(path):
     with open(path, 'r') as f:
         dictionary = json.load(f)
     return dictionary
-
-# Usage
-dictionary = load_dictionary('path_to_your_json_file.json')
 
 
 def main() -> None:
@@ -70,6 +68,38 @@ def find_POS(list_index):
         POS.append(POS_CLASSES[index])
     return POS
     
+def find_morphy(tab):
+    """
+    find the morphy using a numpy array containing 1 one hot vector per feature indicating its value
+    dimension is: (nb_features, nb_classes)
+    """
+    #load dictionnary of morphy
+    dictionary = load_dictionary_morph("src/dataloader/morphy.json")
+    #get the list of the keys
+    keys = list(dictionary.keys())
+    #for each one hot vector of the tab
+    morphy = []
+    #get length of the tab
+    length = tab.shape[0]
+    list_keys= np.array(dictionary.keys())
+    for k in range(length):
+        #get the one hot vector
+        one_hot = tab[k]
+        #get the index of the 1
+        index = torch.argmax(one_hot)
+        #get the key corresponding to the index
+        key = keys[k]
+        #get the value corresponding to the key
+        value = dictionary[key]
+        #add the value to the list
+        if index< len(value):
+            morphy.append(value[index])
+        else:
+            #print("predicted index is out of range of the value list")
+            morphy.append("ERROR")
+    
+    return list_keys, morphy
+    
 
 
 
@@ -95,7 +125,7 @@ def inference(sentence: List[str],
     sentence: list of string
     dictionary: dict[string, int]
     experiment_path: chemin de l'experience: exemple: logs/get_pos_lstm_2
-    return: list of POS labels
+    return: list of POS labels / nothing if morphy
     """
     #load config
     config = load_config(os.path.join(experiment_path, 'config.yaml'))
@@ -131,7 +161,13 @@ def inference(sentence: List[str],
         output = find_POS(output)
 
     if 'morphy' in experiment_path:
-        pass
+        print("shape of output:",output.shape)
+
+        for i in range(len(sentence)):
+            print("WORD:",sentence[i])
+            print("OUTPUT:",find_morphy(output[0][i])[1]) #on print seulement les valeurs pas la liste des clés
+        return("done")
+        
 
 
     return output
@@ -141,12 +177,13 @@ def inference(sentence: List[str],
 if __name__ == '__main__':
     #load a dictionary
     dictionary = load_dictionary("dictionary/English.json")
-    experiment_path = "logs/get_pos_lstm_3"
+    experiment_path = "logs/get_morphy_lstm_French_0"
     #sentence in english
-    sentence = ['i', 'need', 'a','dog', '.','But it aint','gonna','happen','.','I','dont','have','the','money','.']
+    #sentence = ['i', 'need', 'a','dog', '.','But it aint','gonna','happen','.','I','dont','have','the','money','.']
     #sentence in french
-    #sentence = ['je', 'veux', 'un','chien', '.','Mais ça','narrivera','pas','.','Je','nai','pas','dargent','.']
+    sentence = ['je', 'veux', 'un','chien', '.','Mais ça','narrivera','pas','.','Je','nai','pas','argent','.']
     #output: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1]
     res=inference(sentence, dictionary, experiment_path)
     print("sentence:",sentence)
     print("POS:",res)
+

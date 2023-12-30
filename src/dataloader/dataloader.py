@@ -73,7 +73,11 @@ class DataGenerator(Dataset):
         y = self.y[index]
 
         if self.task == 'get_morphy':
-            y = torch.nn.functional.one_hot(y, num_classes=self.c).to(torch.float32)
+            try:
+                y = torch.nn.functional.one_hot(y, num_classes=self.c).to(torch.float32)
+            except:
+                print(f"Error, index={index}")
+
         
         return x, y
     
