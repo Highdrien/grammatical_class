@@ -73,12 +73,8 @@ class DataGenerator(Dataset):
         y = self.y[index]
 
         if self.task == 'get_morphy':
-            try:
-                y = torch.nn.functional.one_hot(y, num_classes=self.c).to(torch.float32)
-            except:
-                print(f"Error, index={index}")
+            y = torch.nn.functional.one_hot(y, num_classes=self.c).to(torch.float32)
 
-        
         return x, y
     
     def get_label_index(self) -> int:
