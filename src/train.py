@@ -70,7 +70,7 @@ def train(config: EasyDict) -> None:
         train_range = tqdm(train_generator)
 
         # Training
-        for x, y_true in train_range:
+        for i, (x, y_true) in enumerate(train_range):
             x = x.to(device)
             y_true = y_true.to(device)
 
@@ -92,7 +92,8 @@ def train(config: EasyDict) -> None:
             optimizer.step()
             optimizer.zero_grad()
 
-            train_range.set_description(f"TRAIN -> epoch: {epoch} || loss: {loss.item():.4f}")
+            current_loss = train_loss / (i + 1)
+            train_range.set_description(f"TRAIN -> epoch: {epoch} || loss: {current_loss:.4f}")
             train_range.refresh()
 
         train_loss = train_loss / n_train
@@ -111,7 +112,7 @@ def train(config: EasyDict) -> None:
             val_loss = 0
             val_metrics = 0
             
-            for x, y_true in val_range:
+            for i, (x, y_true) in enumerate(val_range):
                 x = x.to(device)
                 y_true = y_true.to(device)
 
@@ -128,7 +129,8 @@ def train(config: EasyDict) -> None:
                 val_loss += loss.item()
                 val_metrics += metrics.compute(y_true=y_true, y_pred=y_pred)
 
-                val_range.set_description(f"VAL   -> epoch: {epoch} || loss: {loss.item():.4f}")
+                current_loss = val_loss / (i + 1)
+                val_range.set_description(f"VAL   -> epoch: {epoch} || loss: {current_loss:.4f}")
                 val_range.refresh()
         
         scheduler.step()
