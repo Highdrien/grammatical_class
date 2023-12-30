@@ -4,6 +4,8 @@ from src.dataloader.vocabulary import load_dictionary,replace_word2int
 from src.model.get_model import get_model
 
 import os
+import json
+
 import yaml
 from easydict import EasyDict
 from typing import List, Dict
@@ -15,6 +17,15 @@ from config.process_config import process_config
 def load_config(path: str) -> EasyDict:
     stream = open(path, 'r')
     return EasyDict(yaml.safe_load(stream))
+
+
+def load_dictionary(path):
+    with open(path, 'r') as f:
+        dictionary = json.load(f)
+    return dictionary
+
+# Usage
+dictionary = load_dictionary('path_to_your_json_file.json')
 
 
 def main() -> None:
@@ -59,6 +70,7 @@ def find_POS(list_index):
         POS.append(POS_CLASSES[index])
     return POS
     
+
 
 
 def convert_sentence_to_indexes(sentence,dictionary):
@@ -112,9 +124,15 @@ def inference(sentence: List[str],
 
     output = model(indexes)
     #take this argmax for each output element 
-    output = find_classes(output)
-    #convert indexes to POS
-    output = find_POS(output)
+
+    if 'pos' in experiment_path: #if the model is a pos model
+        output = find_classes(output)
+        #convert indexes to POS
+        output = find_POS(output)
+
+    if 'morphy' in experiment_path:
+        pass
+
 
     return output
 
