@@ -4,7 +4,7 @@ from easydict import EasyDict
 
 from typing import Optional
 
-from src.model.LSTM import LSTMClassifier
+from src.model.LSTM import LSTMClassifier, MorphLSTMClassifier
 # from src.model.BERT import BertClassifier
 
 
@@ -30,6 +30,17 @@ def get_model(config: EasyDict) -> torch.nn.Module:
         if config.model.model_name == 'lstm':
             morphy_config = config.model.lstm_morphy
             model = LSTMClassifier(num_words=config.data.vocab.num_words,
+                                   embedding_size=morphy_config.embedding_size,
+                                   lstm_hidd_size_1=morphy_config.lstm_hidd_size_1,
+                                   lstm_hidd_size_2=morphy_config.lstm_hidd_size_2,
+                                   fc_hidd_size=morphy_config.fc_hidd_size,
+                                   num_classes=num_classes,
+                                   bidirectional=morphy_config.bidirectional,
+                                   activation=morphy_config.activation,
+                                   num_c_possibility=config.task.get_morphy_info.num_features)
+        if config.model.model_name == 'lstm_separate':
+            morphy_config = config.model.lstm_morphy
+            model = MorphLSTMClassifier(num_words=config.data.vocab.num_words,
                                    embedding_size=morphy_config.embedding_size,
                                    lstm_hidd_size_1=morphy_config.lstm_hidd_size_1,
                                    lstm_hidd_size_2=morphy_config.lstm_hidd_size_2,

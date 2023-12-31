@@ -27,7 +27,7 @@ task:
 
 # model options
 model:
-    model_name: lstm
+    model_name: lstm_separate
 
     # model to get POS with LSTM
     lstm_pos:
