@@ -94,7 +94,7 @@ def train(config: EasyDict) -> None:
 
             current_loss = train_loss / (i + 1)
             current_acc = train_metrics / (i + 1)
-            train_range.set_description(f"TRAIN -> epoch: {epoch} || loss: {current_loss:.4f}")
+            train_range.set_description(f"TRAIN -> epoch: {epoch} || loss: {current_loss:.4f} metrics: {current_acc:.4f}")
             train_range.refresh()
 
         train_loss = train_loss / n_train
