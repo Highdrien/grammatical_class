@@ -87,13 +87,14 @@ def train(config: EasyDict) -> None:
 
             train_loss += loss.item()
             train_metrics += metrics.compute(y_true=y_true, y_pred=y_pred)
+            #print("shape of train_metrics:",train_metrics.shape)
 
             loss.backward()
             optimizer.step()
             optimizer.zero_grad()
 
             current_loss = train_loss / (i + 1)
-            current_acc = train_metrics / (i + 1)
+            current_acc = train_metrics[-1] / (i + 1)
             train_range.set_description(f"TRAIN -> epoch: {epoch} || loss: {current_loss:.4f} metrics: {current_acc:.4f}")
             train_range.refresh()
 
