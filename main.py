@@ -52,7 +52,7 @@ def main(options: dict) -> None:
         assert options['path'] is not None, 'Error, please enter the path of your experimentation that you want to test'
         config_path = find_config(experiment_path=options['path'])
         config = load_config(config_path)
-        ic(config)
+        # ic(config)
         test(config=config, logging_path=options['path'])
 
 

@@ -9,7 +9,6 @@ from src.dataloader.dataloader import create_dataloader
 from src.model.get_model import get_model
 from config.config import test_logger
 from src.metrics import get_metrics
-from src.loss import CrossEntropyLossOneHotMorph
 
 
 def test(config: EasyDict, logging_path: str) -> None:
@@ -36,10 +35,7 @@ def test(config: EasyDict, logging_path: str) -> None:
     ic(model.get_number_parameters())
     
     # Loss
-    if config.task.task_name == 'get_pos':
-        criterion = torch.nn.CrossEntropyLoss(reduction='mean')
-    else:
-        criterion = CrossEntropyLossOneHotMorph(reduction='mean')
+    criterion = torch.nn.CrossEntropyLoss(reduction='mean')
 
     # Metrics
     metrics = get_metrics(config=config, device=device)
@@ -63,12 +59,13 @@ def test(config: EasyDict, logging_path: str) -> None:
             y_pred = model.forward(x)
 
             if config.task.task_name == 'get_pos':
-                y_pred = y_pred.permute(0, 2, 1)
-                
-            loss = criterion(y_pred, y_true)
+                    loss = criterion(y_pred.permute(0, 2, 1), y_true)
 
-            if config.task.task_name == 'get_pos':
-                y_pred = y_pred.permute(0, 2, 1)
+            else:
+                loss = 0
+                for c in range(config.task.get_morphy_info.num_classes):
+                    loss += criterion(y_pred[:, :, c, :], y_true[:, :, c, :])
+                loss = loss / config.task.get_morphy_info.num_classes
             
             test_loss += loss.item()
             test_metrics += metrics.compute(y_true=y_true, y_pred=y_pred)
@@ -87,3 +84,5 @@ def test(config: EasyDict, logging_path: str) -> None:
                 metrics=[config.learning.loss] + metrics_name,
                 values=[test_loss] + list(test_metrics))
     
+    for i in range(len(metrics_name)):
+         print(f'{metrics_name[i]}: {test_metrics[i]}')

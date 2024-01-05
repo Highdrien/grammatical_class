@@ -14,7 +14,6 @@ from config.config import train_logger, train_step_logger
 from utils.plot_learning_curves import save_learning_curves
 from src.metrics import get_metrics
 
-from src.loss import CrossEntropyLossOneHotMorph
 
 def train(config: EasyDict) -> None:
 
@@ -38,10 +37,7 @@ def train(config: EasyDict) -> None:
     ic(model.get_number_parameters())
     
     # Loss
-    if config.task.task_name == 'get_pos':
-        criterion = torch.nn.CrossEntropyLoss(reduction='mean')
-    else:
-        criterion = CrossEntropyLossOneHotMorph(reduction='mean')
+    criterion = torch.nn.CrossEntropyLoss(reduction='mean')
 
     # Optimizer and Scheduler
     assert config.learning.optimizer == 'adam', NotImplementedError(
@@ -80,12 +76,13 @@ def train(config: EasyDict) -> None:
             y_pred = model.forward(x)
 
             if config.task.task_name == 'get_pos':
-               y_pred = y_pred.permute(0, 2, 1)
+               loss = criterion(y_pred.permute(0, 2, 1), y_true)
 
-            loss = criterion(y_pred, y_true)
-
-            if config.task.task_name == 'get_pos':
-               y_pred = y_pred.permute(0, 2, 1)
+            else:
+                loss = 0
+                for c in range(config.task.get_morphy_info.num_classes):
+                    loss += criterion(y_pred[:, :, c, :], y_true[:, :, c])
+                loss = loss / config.task.get_morphy_info.num_classes
 
             train_loss += loss.item()
             train_metrics += metrics.compute(y_true=y_true, y_pred=y_pred)
@@ -120,12 +117,13 @@ def train(config: EasyDict) -> None:
                 y_pred = model.forward(x)
 
                 if config.task.task_name == 'get_pos':
-                    y_pred = y_pred.permute(0, 2, 1)
-                    
-                loss = criterion(y_pred, y_true)
+                    loss = criterion(y_pred.permute(0, 2, 1), y_true)
 
-                if config.task.task_name == 'get_pos':
-                    y_pred = y_pred.permute(0, 2, 1)
+                else:
+                    loss = 0
+                    for c in range(config.task.get_morphy_info.num_classes):
+                        loss += criterion(y_pred[:, :, c, :], y_true[:, :, c, :])
+                    loss = loss / config.task.get_morphy_info.num_classes
                 
                 val_loss += loss.item()
                 val_metrics += metrics.compute(y_true=y_true, y_pred=y_pred)
