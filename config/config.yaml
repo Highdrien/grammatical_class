@@ -18,7 +18,7 @@ data:
 
 # task options
 task:
-    task_name: get_pos
+    task_name: get_morphy
     get_pos_info:
         num_classes: 19
     get_morphy_info:
@@ -27,7 +27,7 @@ task:
 
 # model options
 model:
-    model_name: lstm_separate
+    model_name: lstm
 
     # model to get POS with LSTM
     lstm_pos:

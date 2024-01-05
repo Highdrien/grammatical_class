@@ -41,7 +41,7 @@ def get_model(config: EasyDict) -> torch.nn.Module:
                                    num_c_possibility=config.task.get_morphy_info.num_features,
                                    dropout=morphy_config.dropout)
             
-        if config.model.model_name == 'lstm_separate':
+        elif config.model.model_name == 'lstm_separate':
             morphy_config = config.model.lstm_morphy
             model = MorphLSTMClassifier(num_words=config.data.vocab.num_words,
                                    embedding_size=morphy_config.embedding_size,
