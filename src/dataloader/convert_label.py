@@ -68,5 +68,3 @@ if __name__ == '__main__':
     o2 = convert.convert(label_to_convert='_')
     ic(o1)
     ic(o2)
-    print(o1)
-    print

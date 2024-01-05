@@ -108,9 +108,11 @@ class MOR_Metrics(Metrics):
 def get_metrics(config: EasyDict, device: torch.device) -> Metrics:
     task = config.task.task_name
     if task == 'get_pos':
+        print('POS Metrics')
         return POS_Metrics(config=config, device=device)
 
     else:
+        print('MOR Metrics')
         return MOR_Metrics(config=config)
 
 
@@ -141,7 +143,7 @@ if __name__ == "__main__":
     metrics_value = metrics.compute(y_pred=y_pred, y_true=y_true)
     ic(metrics_value)
 
-    ## mode: get_morphy
+    # mode: get_morphy
     x = torch.randint(0, V, (B, K))
     y_pred = torch.rand((B, K, C_mor, N_mor))
     y_true = torch.randint(0, N_mor, (B, K, C_mor))

@@ -38,8 +38,10 @@ def train(config: EasyDict) -> None:
     ic(model.get_number_parameters())
     
     # Loss
-    #criterion = torch.nn.CrossEntropyLoss(reduction='mean')
-    criterion=CrossEntropyLossOneHotMorph(reduction='mean')
+    if config.task.task_name == 'get_pos':
+        criterion = torch.nn.CrossEntropyLoss(reduction='mean')
+    else:
+        criterion = CrossEntropyLossOneHotMorph(reduction='mean')
 
     # Optimizer and Scheduler
     assert config.learning.optimizer == 'adam', NotImplementedError(
@@ -79,15 +81,13 @@ def train(config: EasyDict) -> None:
             if config.task.task_name == 'get_pos':
                y_pred = y_pred.permute(0, 2, 1)
 
-            # print("Shape of y_pred:",y_pred.shape)
-            # print("Shape of y_true:",y_true.shape)
-
             loss = criterion(y_pred, y_true)
 
+            if config.task.task_name == 'get_pos':
+               y_pred = y_pred.permute(0, 2, 1)
 
             train_loss += loss.item()
             train_metrics += metrics.compute(y_true=y_true, y_pred=y_pred)
-            #print("shape of train_metrics:",train_metrics.shape)
 
             loss.backward()
             optimizer.step()

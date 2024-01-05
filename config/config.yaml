@@ -18,7 +18,7 @@ data:
 
 # task options
 task:
-    task_name: get_morphy
+    task_name: get_pos
     get_pos_info:
         num_classes: 19
     get_morphy_info:
