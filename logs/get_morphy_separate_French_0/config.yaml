@@ -1,4 +1,4 @@
-config_metadata: 'Saving time : 01/05/2024, 19:09:28'
+config_metadata: 'Saving time : 01/06/2024, 00:27:10'
 name: 'get_morphy_separate_French'
 save_experiment: true
 
@@ -40,11 +40,12 @@ model:
     lstm_morphy:
         lstm_hidd_size_1: 64
         lstm_hidd_size_2: 128
-        fc_hidd_size: [256, 128]
+        fc_hidd_size: [128, 64]
         embedding_size: 64
         bidirectional: true
         activation: 'relu'
         dropout: 0.1
+        add_zero: true
 
 # learning options
 learning:

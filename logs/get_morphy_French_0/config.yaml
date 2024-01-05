@@ -1,4 +1,4 @@
-config_metadata: 'Saving time : 01/05/2024, 18:54:38'
+config_metadata: 'Saving time : 01/06/2024, 00:33:48'
 name: 'get_morphy_French'
 save_experiment: true
 
@@ -39,21 +39,22 @@ model:
         dropout: 0.1
     lstm_morphy:
         lstm_hidd_size_1: 64
-        lstm_hidd_size_2: 64
-        fc_hidd_size: [256]
+        lstm_hidd_size_2: 128
+        fc_hidd_size: [128, 64]
         embedding_size: 64
         bidirectional: true
         activation: 'relu'
         dropout: 0.1
+        add_zero: true
 
 # learning options
 learning:
     loss: 'crossentropy'
     optimizer: 'adam'
     learning_rate: 0.01
-    milesstone: [5, 15]
-    gamma: 0.1
-    epochs: 30
+    milesstone: [10, 20]
+    gamma: 0.5
+    epochs: 20
     batch_size: 2048
     shuffle: true
     drop_last: true
@@ -63,4 +64,4 @@ learning:
 # metrics options
 metrics:
     acc: true
-    allgood: false
+    allgood: true
