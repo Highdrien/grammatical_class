@@ -27,7 +27,7 @@ task:
 
 # model options
 model:
-    model_name: lstm
+    model_name: lstm_separate       # lstm or lstm_separate
 
     # model to get POS with LSTM
     lstm_pos:
@@ -42,8 +42,8 @@ model:
     # model to get MORPHY with LSTM
     lstm_morphy:
         lstm_hidd_size_1: 64
-        lstm_hidd_size_2: 64
-        fc_hidd_size: [256]
+        lstm_hidd_size_2: 128
+        fc_hidd_size: [256, 128]
         embedding_size: 64
         bidirectional: true
         activation: relu
@@ -55,9 +55,9 @@ learning:
     loss: crossentropy
     optimizer: adam
     learning_rate: 0.01
-    milesstone: [5, 15]
-    gamma: 0.1
-    epochs: 30
+    milesstone: [10, 20]
+    gamma: 0.5
+    epochs: 20
     batch_size: 2048
     shuffle: true
     drop_last: true
@@ -66,4 +66,4 @@ learning:
 
 metrics:
     acc: true
-    allgood: false
+    allgood: true

@@ -1,0 +1,3 @@
+crossentropy: 66.40530014038086
+acc micro: 0.03101850237165179
+allgood: 0.0

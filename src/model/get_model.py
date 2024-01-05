@@ -51,7 +51,8 @@ def get_model(config: EasyDict) -> torch.nn.Module:
                                    num_classes=num_classes,
                                    bidirectional=morphy_config.bidirectional,
                                    activation=morphy_config.activation,
-                                   num_c_possibility=config.task.get_morphy_info.num_features)
+                                   num_c_possibility=config.task.get_morphy_info.num_features,
+                                   dropout=morphy_config.dropout)
         
         else:
             raise NotImplementedError("No other lstm model for get morphy was implemented")
