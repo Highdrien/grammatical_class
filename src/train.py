@@ -14,7 +14,7 @@ from config.config import train_logger, train_step_logger
 from utils.plot_learning_curves import save_learning_curves
 from src.metrics import get_metrics
 
-from src.loss import CrossEntropyLossOneHot, CrossEntropyLossOneHotMorph
+from src.loss import CrossEntropyLossOneHotMorph
 
 def train(config: EasyDict) -> None:
 

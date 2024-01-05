@@ -8,6 +8,8 @@ from src.model.LSTM import LSTMClassifier
 from src.model.separate_LSTM import MorphLSTMClassifier
 # from src.model.BERT import BertClassifier
 
+NUN_C_POSSIBILITY = [2, 2, 3, 5, 3, 4, 13, 2, 13, 5, 5, 5, 5, 2, 4, 2, 3, 4, 6, 3, 4, 5, 2, 3, 2, 2, 3, 4]
+
 
 def get_model(config: EasyDict) -> torch.nn.Module:
     """ get model according a configuration """
@@ -52,7 +54,7 @@ def get_model(config: EasyDict) -> torch.nn.Module:
                                    num_classes=num_classes,
                                    bidirectional=morphy_config.bidirectional,
                                    activation=morphy_config.activation,
-                                   num_c_possibility=config.task.get_morphy_info.num_features,
+                                   num_c_possibility=NUN_C_POSSIBILITY,
                                    dropout=morphy_config.dropout)
         
         else:

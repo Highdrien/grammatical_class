@@ -43,11 +43,12 @@ model:
     lstm_morphy:
         lstm_hidd_size_1: 64
         lstm_hidd_size_2: 128
-        fc_hidd_size: [256, 128]
+        fc_hidd_size: [128, 64]
         embedding_size: 64
         bidirectional: true
         activation: relu
         dropout: 0.1
+        add_zero: true
 
 
 # learning options

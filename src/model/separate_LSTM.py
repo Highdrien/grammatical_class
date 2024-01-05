@@ -2,9 +2,12 @@ import torch
 from torch import Tensor
 import torch.nn as nn
 from numpy import prod
+from icecream import ic 
 
-from typing import List, Union, Optional, Iterator, Tuple
+from typing import List, Union, Iterator, Tuple
 from torch.nn.parameter import Parameter
+
+NUN_C_POSSIBILITY = [2, 2, 3, 5, 3, 4, 13, 2, 13, 5, 5, 5, 5, 2, 4, 2, 3, 4, 6, 3, 4, 5, 2, 3, 2, 2, 3, 4]
 
 
 class MorphLSTMClassifier(nn.Module):
@@ -13,12 +16,13 @@ class MorphLSTMClassifier(nn.Module):
                  embedding_size: int,
                  lstm_hidd_size_1: int,
                  num_classes: int,
-                 lstm_hidd_size_2: Optional[Union[int, None]]=None,
-                 fc_hidd_size: Optional[List[int]]=[], 
-                 bidirectional: Optional[bool]=True,
-                 activation: Optional[str]='relu',
-                 num_c_possibility: Optional[int]=1,
-                 dropout: Optional[float]=0
+                 num_c_possibility: List[int],
+                 lstm_hidd_size_2: Union[int, None]=None,
+                 fc_hidd_size: List[int]=[], 
+                 bidirectional: bool=True,
+                 activation: str='relu',
+                 dropout: float=0,
+                 add_zero: bool=False
                  ) -> None:
         """ Model LSTM 
         ## Arguments:
@@ -45,6 +49,10 @@ class MorphLSTMClassifier(nn.Module):
         num_c_possibility: int = 1
             number of features of classes. must be 1 for get_pos and not 1 for get_mophy
         """
+        self.num_c_possibility = num_c_possibility
+        self.max_num_possibility = max(num_c_possibility)
+        self.add_zero = add_zero
+
         super(MorphLSTMClassifier, self).__init__()
         self.embedding = nn.Embedding(num_embeddings=num_words,
                                       embedding_dim=embedding_size)
@@ -70,7 +78,7 @@ class MorphLSTMClassifier(nn.Module):
 
         # Fully Connected Layers
         last_lstm_hidd_layers_size = lstm_hidd_size_1 if not self.have_lstm_2 else lstm_hidd_size_2
-        fc_hidd_size = [last_lstm_hidd_layers_size * mul] + fc_hidd_size + [num_classes * num_c_possibility]
+        fc_hidd_size = [last_lstm_hidd_layers_size * mul] + fc_hidd_size
         self.fc = []
 
         for i in range(len(fc_hidd_size) - 1):
@@ -80,15 +88,16 @@ class MorphLSTMClassifier(nn.Module):
                                      out_features=fc_hidd_size[i + 1]))
         self.fc = nn.Sequential(*self.fc)
 
-        #Create a number of Dense layer equal to the number of classes num_classes and their size is num_c_possibility their input is the output of the last Dense layer
         self.morph: List[nn.Linear] = []
         for i in range(num_classes):
-            self.morph.append(nn.Linear(in_features=num_c_possibility, out_features=num_c_possibility)) #chaque couche doit récupérer un object de taille 13
+            if add_zero:
+                self.morph.append(nn.Linear(in_features=fc_hidd_size[-1],
+                                            out_features=self.num_c_possibility[i]))
+            else:
+                self.morph.append(nn.Linear(in_features=fc_hidd_size[-1],
+                                            out_features=self.max_num_possibility))
             
-
-        self.do_morphy = (num_c_possibility != 1)
         self.num_classes = num_classes
-        self.num_c_possibility = num_c_possibility
 
     def forward(self, x: Tensor) -> Tensor:
         """ forward
@@ -101,8 +110,7 @@ class MorphLSTMClassifier(nn.Module):
             C: number of classes
         """
 
-        x = x.to("cuda")
-        sequence_length = x.shape[-1]
+        B, K = x.shape
 
         x = self.embedding(x)
         x = self.activation(x)
@@ -114,17 +122,22 @@ class MorphLSTMClassifier(nn.Module):
             x = self.activation(x)
             x, _ = self.lstm_2(x)
 
-        logits = self.fc(x)
+        x = self.fc(x)
 
-        if self.do_morphy:
-            logits = self.dropout(logits)
-            logits = self.activation(logits)
-            logits = logits.view(-1, sequence_length, self.num_classes, self.num_c_possibility)
-            logit_list = []
-            for i in range(self.num_classes):
-                logits_i = self.morph[i](logits[:, :, i, :])
+        x = self.dropout(x)
+        x = self.activation(x)
+        # x = x.view(-1, K, self.num_classes, self.max_num_possibility)
+        logit_list = []
+        for i in range(self.num_classes):
+            logits_i = self.morph[i](x)
+            if self.add_zero:
+                zeros = torch.zeros((B, K, self.max_num_possibility - self.num_c_possibility[i]),
+                                    dtype=torch.float32,
+                                    device=x.device)
+                logit_list.append(torch.concat([logits_i, zeros], dim=2))
+            else:
                 logit_list.append(logits_i)
-            logits = torch.stack(logit_list, dim=2)
+        logits = torch.stack(logit_list, dim=2)
             
         return logits
 
@@ -149,16 +162,26 @@ if __name__ == '__main__':
                                 embedding_size=64,
                                 lstm_hidd_size_1=64,
                                 lstm_hidd_size_2=None,
-                                fc_hidd_size=[],
+                                fc_hidd_size=[64],
                                 num_classes=19,
                                 bidirectional=True,
                                 activation='relu',
-                                num_c_possibility=13,
-                                dropout=0.1)
+                                num_c_possibility=NUN_C_POSSIBILITY,
+                                dropout=0.1,
+                                add_zero=False)
+    
+    print(model)
 
     for name, param in model.named_parameters():
-        print(name, param.shape)
+        print(name, param.shape, param.device)
 
     print(model.get_number_parameters())
+
+    x = torch.randint(low=0, high=67814, size=(2048, 10))
+
+    print(x.shape, x.device)
+
+    y = model.forward(x=x)
+    print(y.shape)
 
     
