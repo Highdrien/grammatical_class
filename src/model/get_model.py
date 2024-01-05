@@ -4,7 +4,8 @@ from easydict import EasyDict
 
 from typing import Optional
 
-from src.model.LSTM import LSTMClassifier, MorphLSTMClassifier
+from src.model.LSTM import LSTMClassifier
+from src.model.separate_LSTM import MorphLSTMClassifier
 # from src.model.BERT import BertClassifier
 
 
