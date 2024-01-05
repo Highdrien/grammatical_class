@@ -1,81 +1,89 @@
+import os
 import torch
+import numpy as np
 from tqdm import tqdm
 from easydict import EasyDict
+from icecream import ic
+
 from src.dataloader.dataloader import create_dataloader
 from src.model.get_model import get_model
-from src.metrics import compute_metrics
-import matplotlib.pyplot as plt
-from config.config import train_logger, train_step_logger
-import time
+from config.config import test_logger
+from src.metrics import get_metrics
+from src.loss import CrossEntropyLossOneHotMorph
 
-def test(config: EasyDict,checkpoint_name='get_pos_lstm_1') -> None:
+
+def test(config: EasyDict, logging_path: str) -> None:
+
     # Use gpu or cpu
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and config.learning.device == 'cuda':
         device = torch.device("cuda")
     else:
         device = torch.device("cpu")
+    ic(device)
 
-    # Get test data
+    # Get data
     test_generator, _ = create_dataloader(config=config, mode='test')
-    #test du dataloader
-    #affiche le premier élément du dataloader, sa shape et son type
-    print("Shape du batch:",next(iter(test_generator))[0].shape)
-    print("First element du batch:",next(iter(test_generator))[0][0])
-    print("Shape of the first element du batch:",next(iter(test_generator))[0][0].shape)
-
-
-
     n_test = len(test_generator)
+    ic(n_test)
 
     # Get model
     model = get_model(config)
     model = model.to(device)
-
+    checkpoint_path = os.path.join(logging_path, 'checkpoint.pt')
+    assert os.path.isfile(checkpoint_path), f'Error: model weight was not found in {checkpoint_path}'
+    model.load_state_dict(torch.load(checkpoint_path, map_location=device))
+    ic(model)
+    ic(model.get_number_parameters())
+    
     # Loss
-    assert config.learning.loss == 'crossentropy', NotImplementedError(
-        f"The loss '{config.learning.loss}' was not implemented. Only 'crossentropy' is implemented")
-    criterion = torch.nn.CrossEntropyLoss(reduction='mean')
+    if config.task.task_name == 'get_pos':
+        criterion = torch.nn.CrossEntropyLoss(reduction='mean')
+    else:
+        criterion = CrossEntropyLossOneHotMorph(reduction='mean')
 
-    #get path to the trained model
-    path='logs/'+checkpoint_name+'/checkpoint.pt' 
+    # Metrics
+    metrics = get_metrics(config=config, device=device)
+    metrics_name = metrics.get_metrics_name()
+    ic(metrics_name)
 
-    # Load the trained weights
-    model.load_state_dict(torch.load(path))
-    print("Model loaded successfully!")
-
-    # Testing
-    model.eval()
+    ###############################################################
+    # Start Evaluation                                            #
+    ###############################################################
     test_loss = 0
-    test_metrics = 0
     test_range = tqdm(test_generator)
+    test_metrics = np.zeros((len(metrics_name)))
 
+    model.eval()
     with torch.no_grad():
-        for x,y_true in test_range:
-
-            print("shape of x:",x.shape)
-            print("shape of y_true:",y_true.shape)
+        
+        for i, (x, y_true) in enumerate(test_range):
             x = x.to(device)
-            #y_true = y_true.to(device)
+            y_true = y_true.to(device)
 
             y_pred = model.forward(x)
-            y_pred = y_pred.permute(0, 2, 1)
 
-            #y_pred back to cpu
-            y_pred=y_pred.cpu()
+            if config.task.task_name == 'get_pos':
+                y_pred = y_pred.permute(0, 2, 1)
+                
+            loss = criterion(y_pred, y_true)
 
-            test_metrics += compute_metrics(y_pred, y_true, config.task.get_pos_info.num_classes)
+            if config.task.task_name == 'get_pos':
+                y_pred = y_pred.permute(0, 2, 1)
+            
+            test_loss += loss.item()
+            test_metrics += metrics.compute(y_true=y_true, y_pred=y_pred)
 
+            current_loss = test_loss / (i + 1)
+            test_range.set_description(f"TEST loss: {current_loss:.4f}")
             test_range.refresh()
 
+    ###################################################################
+    # Save Scores in logs                                             #
+    ###################################################################
+    test_loss = test_loss / n_test
     test_metrics = test_metrics / n_test
-    print(f"Test Metrics: {test_metrics[0]:.4f}")
-
-    # Optionally, you can save the test results or generate plots if needed.
-
-if __name__ == "__main__":
-    # Assuming you have a config object for testing, update this accordingly
-    test_config = EasyDict({
-        # Add your test configuration parameters here
-    })
-
-    test(test_config)
+    
+    test_logger(path=logging_path,
+                metrics=[config.learning.loss] + metrics_name,
+                values=[test_loss] + list(test_metrics))
+    

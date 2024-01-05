@@ -6,6 +6,7 @@ from icecream import ic
 from typing import Optional
 
 from src.train import train
+from src.test import test
 from src.baseline.baseline_model import launch_baseline
 from config.process_config import process_config
 
@@ -29,7 +30,7 @@ def find_config(experiment_path: str) -> str:
     
     exit()
 
-IMPLEMENTED = ['train', 'baseline']
+IMPLEMENTED = ['train', 'baseline', 'test']
 
 def main(options: dict) -> None:
 
@@ -46,6 +47,13 @@ def main(options: dict) -> None:
     if options['mode'] == 'baseline':
         config = load_config(options['config_path'])
         launch_baseline(config)
+    
+    if options['mode'] == 'test':
+        assert options['path'] is not None, 'Error, please enter the path of your experimentation that you want to test'
+        config_path = find_config(experiment_path=options['path'])
+        config = load_config(config_path)
+        ic(config)
+        test(config=config, logging_path=options['path'])
 
 
 if __name__ == "__main__":
