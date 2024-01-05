@@ -117,6 +117,8 @@ class MorphLSTMClassifier(nn.Module):
         logits = self.fc(x)
 
         if self.do_morphy:
+            logits = self.dropout(logits)
+            logits = self.activation(logits)
             logits = logits.view(-1, sequence_length, self.num_classes, self.num_c_possibility)
             logit_list = []
             for i in range(self.num_classes):
@@ -129,12 +131,7 @@ class MorphLSTMClassifier(nn.Module):
     def get_number_parameters(self) -> int:
         """ return the number of parameters of the model """
         return sum([prod(param.size()) for param in self.parameters()])
-
-    def parameters(self, recurse: bool = True) -> Iterator[Parameter]:
-        yield from super().parameters(recurse=recurse)
-        for c in range(self.num_classes):
-            yield from self.morph[c].parameters(recurse=False)
-    
+   
     def named_parameters(self, prefix: str = '', recurse: bool = True, remove_duplicate: bool = True) -> Iterator[Tuple[str, Parameter]]:
         yield from super().named_parameters(prefix=prefix, recurse=recurse, remove_duplicate=remove_duplicate)
         for c in range(self.num_classes):
@@ -148,9 +145,11 @@ class MorphLSTMClassifier(nn.Module):
 
 
 if __name__ == '__main__':
-    model = MorphLSTMClassifier(num_words=30,
+    model = MorphLSTMClassifier(num_words=67814,
                                 embedding_size=64,
                                 lstm_hidd_size_1=64,
+                                lstm_hidd_size_2=None,
+                                fc_hidd_size=[],
                                 num_classes=19,
                                 bidirectional=True,
                                 activation='relu',
@@ -159,7 +158,7 @@ if __name__ == '__main__':
 
     for name, param in model.named_parameters():
         print(name, param.shape)
-        if param.shape == torch.Size([13, 13]):
-            print(param[0, 0])
+
+    print(model.get_number_parameters())
 
     
