@@ -17,7 +17,8 @@ class LSTMClassifier(nn.Module):
                  fc_hidd_size: Optional[List[int]]=[], 
                  bidirectional: Optional[bool]=True,
                  activation: Optional[str]='relu',
-                 num_c_possibility: Optional[int]=1
+                 num_c_possibility: Optional[int]=1,
+                 dropout: Optional[float]=0
                  ) -> None:
         """ Model LSTM 
         ## Arguments:
@@ -43,6 +44,8 @@ class LSTMClassifier(nn.Module):
             choose an activation function between relu or softmax
         num_c_possibility: int = 1
             number of features of classes. must be 1 for get_pos and not 1 for get_mophy
+        dropout: float = 0.
+            dropout rate between layers
         """
         super(LSTMClassifier, self).__init__()
         self.embedding = nn.Embedding(num_embeddings=num_words,
@@ -54,6 +57,8 @@ class LSTMClassifier(nn.Module):
                               hidden_size=lstm_hidd_size_1,
                               batch_first=True,
                               bidirectional=bidirectional)
+        
+        self.dropout = nn.Dropout(p=dropout)
 
         self.have_lstm_2 = lstm_hidd_size_2 is not None
         if self.have_lstm_2:
@@ -71,6 +76,7 @@ class LSTMClassifier(nn.Module):
         self.fc = []
 
         for i in range(len(fc_hidd_size) - 1):
+            self.fc.append(self.dropout)
             self.fc.append(self.activation)
             self.fc.append(nn.Linear(in_features=fc_hidd_size[i],
                                      out_features=fc_hidd_size[i + 1]))
@@ -98,6 +104,8 @@ class LSTMClassifier(nn.Module):
         x, _ = self.lstm_1(x)
 
         if self.have_lstm_2:
+            x = self.dropout(x)
+            x = self.activation(x)
             x, _ = self.lstm_2(x)
         
         logits = self.fc(x)

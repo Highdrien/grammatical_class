@@ -24,7 +24,8 @@ def get_model(config: EasyDict) -> torch.nn.Module:
                                num_classes=num_classes,
                                bidirectional=pos_config.bidirectional,
                                activation=pos_config.activation,
-                               num_c_possibility=1)
+                               num_c_possibility=1,
+                               dropout=pos_config.dropout)
     
     elif task_name == 'get_morphy':
         if config.model.model_name == 'lstm':
@@ -37,7 +38,9 @@ def get_model(config: EasyDict) -> torch.nn.Module:
                                    num_classes=num_classes,
                                    bidirectional=morphy_config.bidirectional,
                                    activation=morphy_config.activation,
-                                   num_c_possibility=config.task.get_morphy_info.num_features)
+                                   num_c_possibility=config.task.get_morphy_info.num_features,
+                                   dropout=morphy_config.dropout)
+            
         if config.model.model_name == 'lstm_separate':
             morphy_config = config.model.lstm_morphy
             model = MorphLSTMClassifier(num_words=config.data.vocab.num_words,

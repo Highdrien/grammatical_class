@@ -72,6 +72,7 @@ def train(config: EasyDict) -> None:
         train_range = tqdm(train_generator)
 
         # Training
+        model.train()
         for i, (x, y_true) in enumerate(train_range):
             x = x.to(device)
             y_true = y_true.to(device)
@@ -94,12 +95,8 @@ def train(config: EasyDict) -> None:
             optimizer.zero_grad()
 
             current_loss = train_loss / (i + 1)
-            current_acc = train_metrics[-1] / (i + 1)
-            train_range.set_description(f"TRAIN -> epoch: {epoch} || loss: {current_loss:.4f} metrics: {current_acc:.4f}")
+            train_range.set_description(f"TRAIN -> epoch: {epoch} || loss: {current_loss:.4f}")
             train_range.refresh()
-
-        train_loss = train_loss / n_train
-        train_metrics = train_metrics / n_train
 
         ###############################################################
         # Start Validation                                            #
@@ -108,6 +105,8 @@ def train(config: EasyDict) -> None:
         val_loss = 0
         val_metrics = np.zeros((len(metrics_name)))
         val_range = tqdm(val_generator)
+
+        model.eval()
 
         with torch.no_grad():
 
@@ -135,17 +134,15 @@ def train(config: EasyDict) -> None:
                 val_range.set_description(f"VAL   -> epoch: {epoch} || loss: {current_loss:.4f}")
                 val_range.refresh()
         
-        scheduler.step()
-
-        val_loss = val_loss / n_val
-        val_metrics = val_metrics / n_val
-        
+        scheduler.step()       
 
         ###################################################################
         # Save Scores in logs                                             #
         ###################################################################
         train_loss = train_loss / n_train
         val_loss = val_loss / n_val
+        train_metrics = train_metrics / n_train
+        val_metrics = val_metrics / n_val
         
         if save_experiment:
             train_step_logger(path=logging_path, 

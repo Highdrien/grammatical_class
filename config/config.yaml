@@ -37,6 +37,7 @@ model:
         embedding_size: 64
         bidirectional: true
         activation: relu
+        dropout: 0.1
     
     # model to get MORPHY with LSTM
     lstm_morphy:
@@ -46,6 +47,7 @@ model:
         embedding_size: 64
         bidirectional: true
         activation: relu
+        dropout: 0.1
 
 
 # learning options
