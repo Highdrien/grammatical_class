@@ -7,7 +7,10 @@ def change_name(config: EasyDict) -> None:
 
     config.name = f"{task_name}_{config.data.language}"
     if task_name == 'get_morphy' and 'separate' in model_name:
-        config.name = f"{task_name}_separate_{config.data.language}"
+        if not config.model.lstm_morphy.add_zero:
+            config.name = f"{task_name}_separate_{config.data.language}"
+        else:
+            config.name = f"{task_name}_sep0_{config.data.language}"
 
 
 def analyse_config(config: EasyDict) -> None:
