@@ -45,7 +45,7 @@ model:
         bidirectional: true
         activation: 'relu'
         dropout: 0.1
-        add_zero: true
+        add_zero: false
 
 # learning options
 learning:
