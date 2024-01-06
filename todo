@@ -1,5 +1,7 @@
-faire un model qui prends en entrée les pos et les morphy
-écrire le rapport
-faire / continuer la baseline
-déencode les labels
-faire un truc de prédiction
+- faire un model qui prends en entrée les pos et les morphy
+- écrire le rapport
+- faire / continuer la baseline
+    voir les shapes dans le dataloader ligne 57
+- faire un truc de prédiction
+    et donc déencoder les labels
+- compléter le README
