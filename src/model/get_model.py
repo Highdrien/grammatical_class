@@ -47,15 +47,16 @@ def get_model(config: EasyDict) -> torch.nn.Module:
         elif config.model.model_name == 'lstm_separate':
             morphy_config = config.model.lstm_morphy
             model = MorphLSTMClassifier(num_words=config.data.vocab.num_words,
-                                   embedding_size=morphy_config.embedding_size,
-                                   lstm_hidd_size_1=morphy_config.lstm_hidd_size_1,
-                                   lstm_hidd_size_2=morphy_config.lstm_hidd_size_2,
-                                   fc_hidd_size=morphy_config.fc_hidd_size,
-                                   num_classes=num_classes,
-                                   bidirectional=morphy_config.bidirectional,
-                                   activation=morphy_config.activation,
-                                   num_c_possibility=NUN_C_POSSIBILITY,
-                                   dropout=morphy_config.dropout)
+                                        embedding_size=morphy_config.embedding_size,
+                                        lstm_hidd_size_1=morphy_config.lstm_hidd_size_1,
+                                        lstm_hidd_size_2=morphy_config.lstm_hidd_size_2,
+                                        fc_hidd_size=morphy_config.fc_hidd_size,
+                                        num_classes=num_classes,
+                                        bidirectional=morphy_config.bidirectional,
+                                        activation=morphy_config.activation,
+                                        num_c_possibility=NUN_C_POSSIBILITY,
+                                        dropout=morphy_config.dropout,
+                                        add_zero=morphy_config.add_zero)
         
         else:
             raise NotImplementedError("No other lstm model for get morphy was implemented")
