@@ -22,7 +22,7 @@ def split_data_to_word_label(data: List[Sequence],
         seq_x, seq_y = [], []
         for word_info in sequence:
             seq_x.append(word_info[word_index])
-            seq_y.append(convert_label.convert(label_to_convert=word_info[label_index]))
+            seq_y.append(convert_label.encode(label_to_convert=word_info[label_index]))
         x.append(seq_x)
         y.append(seq_y)
 
