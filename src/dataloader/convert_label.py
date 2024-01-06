@@ -65,7 +65,10 @@ class Morphy(Convert):
                remove_Not: bool=True) -> str:
         label_decode = {}
         for i, (key, value) in enumerate(self.label.items()):
-            label_decode[key] = value[label_to_decode[i]]
+            if label_to_decode[i] < len(value):
+                label_decode[key] = value[label_to_decode[i]]
+            else:
+                label_decode[key] = value[0]
         
         output = ''
         for key, value in label_decode.items():
