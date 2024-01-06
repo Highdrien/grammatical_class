@@ -3,10 +3,9 @@ from easydict import EasyDict
 
 def change_name(config: EasyDict) -> None:
     task_name = config.task.task_name
-    model_name = config.model.model_name
 
     config.name = f"{task_name}_{config.data.language}"
-    if task_name == 'get_morphy' and 'separate' in model_name:
+    if task_name == 'get_morphy' and config.model.lstm_morphy.separate:
         if not config.model.lstm_morphy.add_zero:
             config.name = f"{task_name}_separate_{config.data.language}"
         else:
@@ -24,10 +23,6 @@ def analyse_config(config: EasyDict) -> None:
     process_assert(possible=['get_pos', 'get_morphy'],
                    value=config.task.task_name,
                    name_value='task name')
-    
-    process_assert(possible=['lstm', 'bert','lstm_separate'],
-                   value=config.model.model_name,
-                   name_value='model name')
     
     process_assert(possible=['relu', 'sigmoid'],
                    value=config.model.lstm_pos.activation,

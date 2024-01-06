@@ -28,7 +28,6 @@ task:
 
 # model options
 model:
-    model_name: 'lstm'
     lstm_pos:
         lstm_hidd_size_1: 64
         lstm_hidd_size_2: null
@@ -45,6 +44,7 @@ model:
         bidirectional: true
         activation: 'relu'
         dropout: 0.1
+        separate: false 
         add_zero: true
 
 # learning options

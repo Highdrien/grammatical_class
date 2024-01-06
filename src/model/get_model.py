@@ -31,8 +31,8 @@ def get_model(config: EasyDict) -> torch.nn.Module:
                                dropout=pos_config.dropout)
     
     elif task_name == 'get_morphy':
-        if config.model.model_name == 'lstm':
-            morphy_config = config.model.lstm_morphy
+        morphy_config = config.model.lstm_morphy
+        if not morphy_config.separate:
             model = LSTMClassifier(num_words=config.data.vocab.num_words,
                                    embedding_size=morphy_config.embedding_size,
                                    lstm_hidd_size_1=morphy_config.lstm_hidd_size_1,
@@ -44,8 +44,7 @@ def get_model(config: EasyDict) -> torch.nn.Module:
                                    num_c_possibility=config.task.get_morphy_info.num_features,
                                    dropout=morphy_config.dropout)
             
-        elif config.model.model_name == 'lstm_separate':
-            morphy_config = config.model.lstm_morphy
+        else:
             model = MorphLSTMClassifier(num_words=config.data.vocab.num_words,
                                         embedding_size=morphy_config.embedding_size,
                                         lstm_hidd_size_1=morphy_config.lstm_hidd_size_1,
@@ -58,9 +57,7 @@ def get_model(config: EasyDict) -> torch.nn.Module:
                                         dropout=morphy_config.dropout,
                                         add_zero=morphy_config.add_zero)
         
-        else:
-            raise NotImplementedError("No other lstm model for get morphy was implemented")
-    
+
     else:
         raise NotImplementedError(f"Error, expected task_name be get_morphy or get_pos but found: {task_name}")
     
