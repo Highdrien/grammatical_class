@@ -13,12 +13,13 @@ data:
     vocab:
         path: dictionary        # path to the vocab dictionnary
         unk_rate: 0.01          # rate of words dropout
-        save: true              # save the vocab or not
+        save: false             # save the vocab or not
         num_words: 33992        # number of words (that will change depending of the language and unk_rate)
 
 # task options
 task:
     task_name: get_morphy       # task do to: must be get_pos or get_morphy
+    use_pos_for_morphy: false
     get_pos_info:
         num_classes: 19         # number of POS classes
     get_morphy_info:

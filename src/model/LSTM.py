@@ -90,6 +90,8 @@ class LSTMClassifier(nn.Module):
         """ forward
         take x Tensor with shape: (B, K)
         return output Tensor with shape: (B, K, C)
+        
+        if morphy: output shape: (B, K, C, N)
 
         where:
             B: batch_size
