@@ -136,6 +136,7 @@ montre la figure suivante:
     \caption{Valeurs de la métrique allgood par epochs.}
 \end{figure}
 
+
 L'entraînement requiert un temps plus long que pour la tâche de POS-tagging car il y a beaucoups plus d'attributs à prédire.
 On obtient une accuracy de validation final de VALEUR, et les courbes montrent que le modèle subit un léger sur-apprentissage (comme le montre la valeur de la loss de validation).
 
@@ -145,7 +146,7 @@ Pour la tâche de prédiction des traits morphologiques avec la méthode $separa
     \centering
     \begin{subfigure}{0.45\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{acc_micro_morpho_separate.png}
+        \includegraphics[width=\linewidth]{acc_micro_morpho_separate_no0.png}
         \caption{Valeurs de l'accuracy d'entraînement et de validation par epochs.}
     \end{subfigure}
     \hfill
@@ -155,9 +156,22 @@ Pour la tâche de prédiction des traits morphologiques avec la méthode $separa
         \caption{Valeurs de la fonction de coût par epochs.}
     \end{subfigure}
     \caption{Courbes d'accuracy et de crossentropy pour la tâche de prédiction des traits morphologiques}
+\end{figure}
 
-On constate que les résultats sont moins bons que pour la méthode $separate_0$ et que le modèle subit un sur-apprentissage plus important. Cela s'explique par le fait que les attributs fictifs rajoutés aux classes 
+On constate que les résultats sont moins bons que pour la méthode $separate_0$ et que le modèle a besoin de plus d'epochs. Cela s'explique par le fait que les attributs fictifs rajoutés aux classes 
 pour que toutes les classes aient le même nombre d'attributs sont des attributs inutiles qui n'apportent pas d'information au modèle et qui peuvent donc le perturber.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 \todo{Mettre ici le graphe d'entrainement}
