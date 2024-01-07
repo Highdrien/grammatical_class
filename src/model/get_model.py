@@ -46,7 +46,7 @@ def get_model(config: EasyDict) -> torch.nn.Module:
                                    dropout=morphy_config.dropout)
             
         else:
-            if config.task.get_morphy_info.use_pos=='false': #si on ne veut pas utiliser pos pour morphy
+            if not config.task.get_morphy_info.use_pos: #si on ne veut pas utiliser pos pour morphy
                 model = MorphLSTMClassifier(num_words=config.data.vocab.num_words,
                                             embedding_size=morphy_config.embedding_size,
                                             lstm_hidd_size_1=morphy_config.lstm_hidd_size_1,
@@ -58,20 +58,23 @@ def get_model(config: EasyDict) -> torch.nn.Module:
                                             num_c_possibility=NUN_C_POSSIBILITY,
                                             dropout=morphy_config.dropout,
                                             add_zero=morphy_config.add_zero)
+                
             else: #si on veut utiliser pos pour morphy
-                model=MorphPosLSTMClassifier(num_words=config.data.vocab.num_words,
-                                            embedding_size=morphy_config.embedding_size,
-                                            lstm_hidd_size_1=morphy_config.lstm_hidd_size_1,
-                                            lstm_hidd_size_2=morphy_config.lstm_hidd_size_2,
-                                            fc_hidd_size=morphy_config.fc_hidd_size,
-                                            num_classes=num_classes,
-                                            bidirectional=morphy_config.bidirectional,
-                                            activation=morphy_config.activation,
-                                            num_c_possibility=NUN_C_POSSIBILITY,
-                                            dropout=morphy_config.dropout,
-                                            add_zero=morphy_config.add_zero,
-                                            pos_config='logs/get_pos_French_2') #TODO: mettre le bon chemin qui mène au fichier de config de pos
-        
+                #TODO: mettre le bon chemin qui mène au fichier de config de pos
+                pos_path = 'logs/get_pos_French'
+                print(f'use model pos: {pos_path}')
+                model = MorphPosLSTMClassifier(num_words=config.data.vocab.num_words,
+                                               embedding_size=morphy_config.embedding_size,
+                                               lstm_hidd_size_1=morphy_config.lstm_hidd_size_1,
+                                               lstm_hidd_size_2=morphy_config.lstm_hidd_size_2,
+                                               fc_hidd_size=morphy_config.fc_hidd_size,
+                                               num_classes=num_classes,
+                                               bidirectional=morphy_config.bidirectional,
+                                               activation=morphy_config.activation,
+                                               num_c_possibility=NUN_C_POSSIBILITY,
+                                               dropout=morphy_config.dropout,
+                                               add_zero=morphy_config.add_zero,
+                                               pos_config=pos_path)
 
     else:
         raise NotImplementedError(f"Error, expected task_name be get_morphy or get_pos but found: {task_name}")
