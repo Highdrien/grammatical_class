@@ -1,4 +1,4 @@
-config_metadata: 'Saving time : 01/07/2024, 11:44:45'
+config_metadata: 'Saving time : 01/07/2024, 23:11:43'
 name: 'get_morphy_sep0_French'
 save_experiment: true
 
@@ -20,12 +20,12 @@ data:
 # task options
 task:
     task_name: 'get_morphy'
-    use_pos_for_morphy: false
     get_pos_info:
         num_classes: 19
     get_morphy_info:
         num_classes: 28
         num_features: 13
+        use_pos: true
 
 # model options
 model:
@@ -55,7 +55,7 @@ learning:
     learning_rate: 0.01
     milesstone: [10, 20]
     gamma: 0.5
-    epochs: 50
+    epochs: 30
     batch_size: 2048
     shuffle: true
     drop_last: true

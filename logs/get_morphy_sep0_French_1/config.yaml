@@ -1,4 +1,4 @@
-config_metadata: 'Saving time : 01/07/2024, 11:29:28'
+config_metadata: 'Saving time : 01/07/2024, 23:03:10'
 name: 'get_morphy_sep0_French'
 save_experiment: true
 
@@ -20,12 +20,12 @@ data:
 # task options
 task:
     task_name: 'get_morphy'
-    use_pos_for_morphy: false
     get_pos_info:
         num_classes: 19
     get_morphy_info:
         num_classes: 28
         num_features: 13
+        use_pos: true
 
 # model options
 model:
