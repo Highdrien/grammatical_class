@@ -18,7 +18,7 @@ data:
 
 # task options
 task:
-    task_name: get_morphy       # task do to: must be get_pos or get_morphy
+    task_name: get_morphy      # task do to: must be get_pos or get_morphy
     use_pos_for_morphy: false
     get_pos_info:
         num_classes: 19         # number of POS classes
@@ -48,7 +48,7 @@ model:
         activation: relu            # activation function between layers (not at the end)
         dropout: 0.1                # rate neuronnes dropout
         separate: true              # separate classes at the end. False -> super tag
-        add_zero: true              # contatene with zero at the end (only with separete==True)
+        add_zero: false              # contatene with zero at the end (only with separete==True)
 
 
 # learning options
@@ -58,7 +58,7 @@ learning:
     learning_rate: 0.01
     milesstone: [10, 20]
     gamma: 0.5
-    epochs: 20
+    epochs: 70
     batch_size: 2048
     shuffle: true
     drop_last: true
