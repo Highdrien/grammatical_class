@@ -34,26 +34,26 @@
 \section{Introduction}
 
 Le but de ce projet est de faire un modèle de langage capable de prédire les morphologies des mots d'une phrase
-(MORPHY), comme le montre la Figure~\ref{fig: example morphy}.
+(\textit{morphy}), comme le montre la Figure~\ref{fig: example morphy}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{morphy.png}
-    \caption{Tag morphologiques d'une phrase Portugaise et sa traduction en Espagnol.
-    Image tiré de~\cite{malaviya-etal-2018-neural}}
+    \caption{Tag morphologique d'une phrase Portugaise et sa traduction en Espagnol.
+    Image tirée de~\cite{malaviya-etal-2018-neural}}
     \label{fig: example morphy}
 \end{figure}    
 
 Nous allons aussi nous demander si est-ce que le fait d'ajouter un prétraitement de la phrase va améliorer
-les performances. L'idée de se prétraitement est de fare prédire le balisage de séquence
-prototypique (POS) des mots, comme le montre la Figure~\ref{fig: example pos}.
+les performances. L'idée de ce prétraitement est de faire prédire le balisage de séquence
+prototypique (\textit{pos}) des mots, comme le montre la Figure~\ref{fig: example pos}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{pos.png}
     \caption{La tâche d'étiquetage des parties du discours : la mise en correspondance des mots d'entrée 
-    $x_1, x_2,..., x_n$ avec les étiquettes POS de sortie $y_1, y_2,..., y_n$.
-    Image tiré de~\cite{pos}}
+    $x_1, x_2,..., x_n$ avec les étiquettes \textit{pos} de sortie $y_1, y_2,..., y_n$.
+    Image tirée de~\cite{pos}}
     \label{fig: example pos}
 \end{figure} 
 
@@ -67,7 +67,7 @@ prototypique (POS) des mots, comme le montre la Figure~\ref{fig: example pos}.
 
 % Dans cette phrase, la tâche de balisage de séquence consisterait à attribuer des étiquettes à chaque mot,
 % indiquant s'il s'agit d'un nom propre, d'une entreprise, d'une localité, etc. Un exemple de balisage de
-% séquence prototypique (POS-tagging) pour cette phrase pourrait être :
+% séquence prototypique (\textit{pos}-tagging) pour cette phrase pourrait être :
 
 % "Jean [name] travaille [verb] chez [pronoun] Microsoft [noun] à [pronoun] Paris [noun]."
 
@@ -82,41 +82,42 @@ prototypique (POS) des mots, comme le montre la Figure~\ref{fig: example pos}.
 
 Nous avons utilisé le dataset Universal Dependencies 2.13 ~\cite{11234/1-5287}, qui comporte 146 langues dont l'anglais
 et le français. Dans ce projet, nous nous sommes seulement concentrés sur le français.
-\textbf{dire combient de phrase, mot ya en français}. Ce dataset possède des phrases, la liste de mots composant ses phrases,
-et les POS et MORPHY qui sont associé à chacun de ses mots. Au total, nous avons ressencé $19$ POS et $28$ MORPHY différents.
+\textbf{dire combien il y a de phrase et de mots en français}. Ce dataset possède des phrases, la liste de mots composant ses phrases,
+et les \textit{pos} et \textit{morphy} qui sont associés à chacun de ses mots. Au total, nous avons recensé $19$ \textit{pos} et $28$ \textit{morphy} différents.
 
 \subsection{Padding}
 
 Les phrases données au modèle doivent être toutes exactement de la même longueur pendant l'entraînement. 
-Notons $K$ la longueur des séquences\footnote{Nous appelons séquence les suites de mots de même taille.}. Nous créons donc des tokens <PAD> pour équilibrer les longeurs des phrases.
-Nous avons choisi d'utiliser une méthode naive pour créer nos séquences qui consiste à coupé chaque phrase pour former les séquences
-de $K$ mots, et de rajouter si besoin des tokens <PAD> pour terminer la dernière sequence.
+Notons $K$ la longueur des séquences\footnote{Nous appelons séquence les suites de mots de même taille.}. Nous créons donc des tokens <PAD> pour équilibrer les longueurs des phrases.
+Nous avons choisi d'utiliser une méthode naïve pour créer nos séquences qui consiste à couper chaque phrase pour former les séquences
+de $K$ mots, et de rajouter si besoin des tokens <PAD> pour terminer la dernière séquence.
 
 \subsection{Gestion des mots inconnus}
 
 Nous avons, avant l'entraînement du modèle, appris un vocabulaire de mots qui fait la correspondance entre les mots et un nombre unique.
-Le vocabulaire a été fait seulement sur les mots qui sont dans la base de données d'entraînement. C'ets donc pour cela qu'il peut
+Le vocabulaire a été fait seulement sur les mots qui sont dans la base de données d'entraînement. C'est donc pour cela qu'il peut
 arriver que des mots de la base de données de validation ou de teste peuvent ne pas être reconnue par le vocabulaire et donc le modèle.
-Pour gérer ces mots inconnus, nous avons décidé de leur attribuer le token particulié: <UNK>. Pour que le modèle
-appraine l'embedding de ce mots, il faut alors rajouter artificiellement des mots inconnus dans le corpus d'entraînement. Nous avons
+Pour gérer ces mots inconnus, nous avons décidé de leur attribuer le token particulier : <UNK>. Pour que le modèle
+apprenne l'embedding de ce mot, il faut alors rajouter artificiellement des mots inconnus dans le corpus d'entraînement. Nous avons
 donc, pour chaque mot de ce corpus, remplacé par <UNK> avec une probabilité de $1\%$.
 
 
 \subsection{Encodage des labels}
 
-Pour encoder les POS, nous avons seulement créer une liste de tous les POS et avons encoder les POS avec leurs indices dans la liste.
-Nous avons aussi ajouté le POS <PAD> pour que le token de padding soit catégorisé dans ce POS.
+Pour encoder les \textit{pos}, nous avons seulement créé une liste de tous les \textit{pos} et avons encodé les \textit{pos} avec leurs indices dans la liste.
+Nous avons aussi ajouté le \textit{pos} <PAD> pour que le token de padding soit catégorisé dans ce \textit{pos}.
 
 
-Pour les MORPHY, cela a été plus compliqué car un mot peut avoir plusieurs MORPHY associé, avec des valeur différentes. Nous avons 
-décidé d'encoder une suite de morphy par une liste de nombre de longeur $28$ et les éléments sont les indices des possibilités de chaque
-MORPHY. Par exemple: le label \textit{Emph=No|Number=Sing|Person=1|PronType=Prs} est encodé par la liste ci-dessous:
+Pour les \textit{morphy}, cela a été plus compliqué, car un mot peut avoir plusieurs \textit{morphy} associé, avec des valeurs différentes. Nous avons 
+décidé d'encoder une suite de \textit{morphy} par une liste de nombre de longueur $28$ et les éléments sont les indices des possibilités de chaque
+\textit{morphy}. Par exemple : le label \textit{Emph=No|Number=Sing|Person=1|PronType=Prs} est encodé par la liste ci-dessous :
 
 [0, 0, 1, 0, 1, 2, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-Comme pour le POS, nous avons aussi ajouté un MORPHY pour le padding. Etant données que le MORPHY qui possède
-le plus de possibilités en possède 13, quand nous encodont les labels en one-hot, nous avons un tensor de shape
-$(19)$ pour les POS et un tensor de shape $(28, 13)$ pour les MORPHY.
+Comme pour le \textit{pos}, nous avons aussi ajouté un \textit{morphy} pour le padding. Étant données que le \textit{morphy} qui possède
+le plus de possibilités en possède 13, quand nous encodons les labels en one-hot, nous avons un tensor de shape
+$(19)$ pour les \textit{pos} et un tensor de shape $(28, 13)$ pour les \textit{morphy}.
+
 
 \section{Méthodologie et Modèle}
 
@@ -144,10 +145,10 @@ Le réseau LSTM que nous avons employé est constitué d'un module LSTM bidirect
 2 directions opposées) ainsi que d'une couche dense de $[n_{neurone}]$ qui récupère l'état caché de la dernière 
 cellule LSTM est produit le vecteur des prédictions. 
 
-\subsubsection{Architecture pour le POS-tagging}
+\subsubsection{Architecture pour le \textit{pos}-tagging}
 Nous utilisons la CrossentropyLoss pour comparer les vecteurs de densité de probabilité de classe prédit par 
 le modèle (un pour chaque mot de la phrase avec le vecteur one-hot correspondant à la vrai classe du mot).
-Nous prédisons un nombre $[n_{classes}]$ d'attributs de POS-tagging possibles. 
+Nous prédisons un nombre $[n_{classes}]$ d'attributs de \textit{pos}-tagging possibles. 
 
 \subsubsection{Architecture pour la prédiction de traits morphologiques}
 Pour la tâche de prédiction des traits morphologiques, la difficulté est supérieure. En effet pour cette tâche 
@@ -174,8 +175,8 @@ classe puis ensuite moyennée pour obtenir la valeur de loss globale.
 
 \todo{Métriques}
 
-\subsection{Résultats et métriques pour le POS-tagging}
-Nous avons donc lancé un entraînement de notre réseau LSTM-Bidirectionel sur 30 epochs pour le POS-tagging et 
+\subsection{Résultats et métriques pour le \textit{pos}-tagging}
+Nous avons donc lancé un entraînement de notre réseau LSTM-Bidirectionel sur 30 epochs pour le \textit{pos}-tagging et 
 nous avons obtenu une accuracy de validation d'environ 90\% ce qui dénote que le réseau à réussi à apprendre 
 correctement cette tâche d'étiquetage, comme le montre la figure suivante:
 
@@ -244,7 +245,7 @@ montre la figure suivante:
 \end{figure}
 
 
-L'entraînement requiert un temps plus long que pour la tâche de POS-tagging car il y a beaucoups plus 
+L'entraînement requiert un temps plus long que pour la tâche de \textit{pos}-tagging car il y a beaucoups plus 
 d'attributs à prédire.
 On obtient une accuracy de validation final de VALEUR, et les courbes montrent que le modèle subit un 
 léger sur-apprentissage (comme le montre la valeur de la loss de validation).
