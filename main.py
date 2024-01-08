@@ -8,7 +8,7 @@ from typing import Optional
 from src.train import train
 from src.test import test
 from src.infer import infer
-from src.baseline.baseline_model import launch_baseline
+from baseline.baseline_benchmark import test_dictionary
 from config.process_config import process_config
 
 
@@ -47,7 +47,7 @@ def main(options: dict) -> None:
     
     if options['mode'] == 'baseline':
         config = load_config(options['config_path'])
-        launch_baseline(config)
+        test_dictionary()
     
     if options['mode'] == 'test':
         assert options['path'] is not None, 'Error, please enter the path of your experimentation that you want to test'
