@@ -40,7 +40,7 @@ Le but de ce projet est de faire un modèle de langage capable de prédire les m
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{morphy.png}
-    \caption{Tag morphologique d'une phrase Portugaise et sa traduction en Espagnol.
+    \caption{Tag morphologique d'une phrase portugaise et sa traduction en espagnol.
     Image tirée de~\cite{malaviya-etal-2018-neural}}
     \label{fig: example morphy}
 \end{figure}    
@@ -62,14 +62,16 @@ prototypique (\textit{pos}) des mots, comme le montre la Figure~\ref{fig: exampl
 
 Nous avons utilisé le dataset Universal Dependencies 2.13 ~\cite{11234/1-5287}, qui comporte 146 langues dont l'anglais
 et le français. Dans ce projet, nous nous sommes seulement concentrés sur le français.
-Le dataset en français contients un ensemble de 47498 phrases, avec 849476 mots, et 76048 mots unique.
+Le dataset en français contient un ensemble de 47498 phrases, avec 849476 mots, et 76048 mots uniques.
 Ce dataset possède des phrases, la liste de mots composant ses phrases,
-et les \textit{pos} et \textit{morphy} qui sont associés à chacun de ses mots. Au total, nous avons recensé $19$ \textit{pos} et $28$ \textit{morphy} différents.
+et les \textit{pos} et \textit{morphy} qui sont associés à chacun de ses mots. Au total, nous avons recensé $19$ \textit{pos} et 
+$28$ \textit{morphy} différents.
 
 \subsection{Padding}
 
 Les phrases données au modèle doivent être toutes exactement de la même longueur pendant l'entraînement. 
-Notons $K$ la longueur des séquences\footnote{Nous appelons séquence les suites de mots de même taille.}. Nous créons donc des tokens <PAD> pour équilibrer les longueurs des phrases.
+Notons $K$ la longueur des séquences\footnote{Nous appelons séquence les suites de mots de même taille.}. Nous créons donc des 
+tokens <PAD> pour équilibrer les longueurs des phrases.
 Nous avons choisi d'utiliser une méthode naïve pour créer nos séquences qui consiste à couper chaque phrase pour former les séquences
 de $K$ mots, et de rajouter si besoin des tokens <PAD> pour terminer la dernière séquence. Nous avons choisi de prendre $K=10$.
 
@@ -85,12 +87,14 @@ donc, pour chaque mot de ce corpus, remplacé par <UNK> avec une probabilité de
 
 \subsection{Encodage des labels}
 
-Pour encoder les \textit{pos}, nous avons seulement créé une liste de tous les \textit{pos} et avons encodé les \textit{pos} avec leurs indices dans la liste.
+Pour encoder les \textit{pos}, nous avons seulement créé une liste de tous les \textit{pos} et avons encodé les \textit{pos} avec 
+leurs indices dans la liste.
 Nous avons aussi ajouté le \textit{pos} <PAD> pour que le token de padding soit catégorisé dans ce \textit{pos}.
 
 
-Pour les \textit{morphy}, cela a été plus compliqué, car un mot peut avoir plusieurs \textit{morphy} associé, avec des valeurs différentes. Nous avons 
-décidé d'encoder une suite de \textit{morphy} par une liste de nombre de longueurs $28$ et les éléments sont les indices des possibilités de chaque
+Pour les \textit{morphy}, cela a été plus compliqué, car un mot peut avoir plusieurs \textit{morphy} associé, avec des valeurs
+différentes. Nous avons décidé d'encoder une suite de \textit{morphy} par une liste de nombre de longueurs $28$ et les éléments
+sont les indices des possibilités de chaque
 \textit{morphy}. Par exemple : le label \textit{Emph=No|Number=Sing|Person=1|PronType=Prs} est encodé par la liste ci-dessous :
 
 [0, 0, 1, 0, 1, 2, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -108,9 +112,9 @@ Le modèle, que nous appelons \textit{GET\_POS}, est constitué d'une couche d'e
 des mots. Les données passent alors dans une couche LSTM bidirectionnel, puis dans une couche dense (fully connected layers),
 avec une sortie à 19 éléments représentant les probabilité de chaque classe \textit{pos}. Nous avons utilisé du 
 dropout sur les neurones des couches LSTM et dense, avec un taux d'oublie de $1\%$. Entre ces 3 couches, nous avons 
-aussi ajouté la fonciton d'activation ReLU~\cite{DBLP:journals/corr/abs-1803-08375}. Nous avons utilisé la CrossentropyLoss 
+aussi ajouté la fonction d'activation ReLU~\cite{DBLP:journals/corr/abs-1803-08375}. Nous avons utilisé la CrossentropyLoss 
 comme fonction de coût, l'optimizer Adam~\cite{kingma2014adam}. Ce modèle est représenté sur la Figure~\ref{fig: model getpos}.
-Nons avons donc en entrée une matrice de taille $B \times K$, contenant l'indices des mots, où $B$ est la taille du batch.
+Nous avons donc en entrée une matrice de taille $B \times K$, contenant l'indice des mots, où $B$ est la taille du batch.
  Et le modèle retourne un tensor de taille $B \times K \times 19$, contenant les probabilités des \textit{pos} pour chaque mot.
 
 \begin{figure}[H]
@@ -122,35 +126,37 @@ Nons avons donc en entrée une matrice de taille $B \times K$, contenant l'indic
 
 \subsection{Architecture des \textit{morphy}}
 
-Pour la tâche de prédiction des traits morphologiques, la difficulté est supérieure. En effet pour cette tâche 
-il faut pour chaque mot de la phrase prédire à la fois son rôle dans la phrase (Verbe, Nom, ect..) mais aussi 
-pour chacune de ses classes prédire des attributs (singulier, pluriel, ...). Nous avons donc crée plusieurs 
-architecture différentes que nous allons présenter. Nous avons aussi du modifier la fonciton de coût par 
+Pour la tâche de prédiction des traits morphologiques, la difficulté est supérieure. En effet, pour cette tâche 
+il faut pour chaque mot de la phrase prédire à la fois son rôle dans la phrase (Verbe, Nom, etc.) mais aussi 
+pour chacune de ses classes prédire des attributs (singulier, pluriel, etc.). Nous avons donc créé plusieurs 
+architecture différente que nous allons présenter. Nous avons aussi dû modifier la fonction de coût par 
 la moyenne des crossentropy sur les 28 \textit{morphy} différents. Nous avons utilisé l'optimizer Adam~\cite{kingma2014adam},
-et avons ajouté un gradient decay, qui fait que le learning rate est divisé par deux lors des épochs 10 et 20.
+et avons ajouté un gradient decay, qui fait que le learning rate est divisé par deux lors des epochs 10 et 20.
 
 \subsubsection{Modèle \textit{SUPERTAG}}
 
-Le modèle commence par une couche d'embedding pour deux couches de LSTM bidirectionnel. Ensuite on fait passer les données 
-dans 3 couches dense caché dont la dernière contients $364$ neurones
+Le modèle commence par une couche d'embedding pour deux couches de LSTM bidirectionnel. Ensuite, on fait passer les données 
+dans 3 couches denses cachées dont la dernière contient $364$ neurones
 \footnote{Nous avons pris $364$ neurones car $364 = 28 \times 13$.}
-Avant que nos données sorte du modèles, elles ont une
+Avant que nos données sortent du modèle, elles ont une
 taille de $B \times B \times 364$. On \textit{reshape} alors les données pour avoir une sortie de taille 
-$B \times B \times 28 \times 13$. La Figure~\ref{fig: model getmorphy} représente ce modèle.
+$B \times B \times 28 \times 13$. La Figure~\ref{fig: model supertag} représente ce modèle.
 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.8\textwidth]{get_morphy_supertag.png}
     \caption{Modèle \textit{SUPERTAG}}
-    \label{fig: model getmorphy}
+    \label{fig: model supertag}
 \end{figure}
 
 \subsubsection{Modèle \textit{SEPARATE}}
 
-On reprends le même début que le model \textit{SUPERTAG} et l'on change la dernière couche. Au lieu de prédire tous les 
-\textit{morphy} en même temps avec une seule couche dense, on a avoir 28 couche dense (une par \textit{morphy}). Chaque couche
-va alors prédire les probabilités lié à son \textit{morphy}. On va alors ajouter à chaque prédiction des couche des $0$
-pour obtenir un vecteur de taille $13$ pour tous les mots. On va ensuite concaténer tous les résultats pour avec une sortir de 
+On reprend le même début que le modèle \textit{SUPERTAG} et l'on change la dernière couche. Au lieu de prédire tous les 
+\textit{morphy} en même temps avec une seule couche dense, on va avoir 28 couche dense (une par \textit{morphy}). Chaque couche
+va alors prédire les probabilités liées à son \textit{morphy}. On va alors ajouter, à chaque prédiction des couches, des $- \infty$
+pour obtenir un vecteur de taille $13$ pour tous les mots
+\footnote{On mets $-\infty$ car cela permet d'avoir une probabilité de $0$ après le softmax.}.
+On va ensuite concaténer tous les résultats avec une sortie de 
 taille $B \times B \times 28 \times 13$. La Figure~\ref{fig: model separate} représente ce modèle.
 
 \begin{figure}[H]
@@ -162,26 +168,36 @@ taille $B \times B \times 28 \times 13$. La Figure~\ref{fig: model separate} rep
 
 \subsubsection{Modèle \textit{FUSION}}
 
-ici on fusionne le model pos et le model separate.
+L'idée de ce modèle est d'utiliser la prédiction du modèle \textit{GET\_POS} pour aider le modèle \textit{SEPARATE}.
+On fait passer les données dans les 2 couches de LSTM, et en sortie on va concaténer la sortie du LSTM avec la sortie
+d'un modèle \textit{GET\_POS} pré-entraînemé.
+La Figure~\ref{fig: model fusion} représente ce modèle.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{get_morphy_fusion.png}
+    \caption{Modèle \textit{FUSION}}
+    \label{fig: model fusion}
+\end{figure}
 
 
 \section{Métriques}
 
-Pour pouvoir mesurer les performances de ces modèles nous avons mis en place plusieurs métriques. Pour la prédiction de 
-\textit{pos}, nous avons utlisé l'accuracy micro et macro. La première nous donne l'accuracy de la prédiction, et la deuxième
+Pour pouvoir mesurer les performances de ces modèles, nous avons mis en place plusieurs métriques. Pour la prédiction de 
+\textit{pos}, nous avons utilisé l'accuracy micro et macro. La première nous donne l'accuracy de la prédiction et la deuxième
 nous donne la moyenne de l'accuracy sur chacune des classes. 
 
 Pour la prédiction de \textit{morphy}, nous avons aussi utilisé l'accuracy micro, et nous avons aussi implémenté une 
-metrique qu'on a appelée \textit{all good}, qui fait la moyenne des mots dont la prédiction de tous les \textit{morphy}
-sont juste. Si la métrique vaut $0.2$, cela veux dire qu'il y a 1 mots sur 5, qui dont la prédiction est totalement bonne.
+métrique qu'on a appelée \textit{all good}, qui fait la moyenne des mots dont la prédiction de tous les \textit{morphy}
+sont juste. Si la métrique vaut $0.2$, cela veut dire qu'il y a 1 mot sur 5, qui dont la prédiction est totalement bonne.
 
 
 \section{Résultats}
 
 \subsection{Résultats pour la prédiction de \textit{pos}}
 Nous avons donc lancé un entraînement de notre réseau LSTM-Bidirectionel sur 30 epochs pour le \textit{pos}-tagging et 
-nous avons obtenu une accuracy de validation d'environ 90\% ce qui dénote que le réseau à réussi à apprendre 
-correctement cette tâche d'étiquetage, comme le montre la figure suivante:
+nous avons obtenu une accuracy de validation d'environ 90\% ce qui dénote que le réseau a réussi à apprendre 
+correctement cette tâche d'étiquetage, comme le montre la figure suivante :
 
 \begin{figure}[H]
     \centering
@@ -200,13 +216,28 @@ correctement cette tâche d'étiquetage, comme le montre la figure suivante:
     \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs.}
 \end{figure}
 
-Les courbes de loss et d'accuracy décrivent un apprentissage efficient dès la 5e epoch. À partir de la 5e epoch, l'apprentissage stagne et si on s'étend à plus de 20 epochs, on risque de faire du surapprentissage, car l'écart entre les performances de l'entraînement et les performances de la validation commence à se creuser. 
-L'accuracy micro est meilleure que l'accuracy macro, ce qui signifie que si les performances de toutes les classes confondues sont meilleures que si on cherche à quantifier les performances globales à partir de chaque classe séparément, traitée de manière égale.
+Les courbes de loss et d'accuracy décrivent un apprentissage efficient dès la 5e epoch. À partir de la 5e epoch, l'apprentissage
+stagne et si on s'étend à plus de 20 epochs, on risque de faire du overfitting, car l'écart entre les performances de l'entraînement
+et les performances de la validation commence à se creuser. 
+L'accuracy micro est meilleure que l'accuracy macro, ce qui signifie que si les performances de toutes les classes confondues sont
+meilleures que si on cherche à quantifier les performances globales à partir de chaque classe séparément, traitée de manière égale.
 
 On constate que la valeur de l'accuracy de validation est un peu plus faible que celle d'entraînement, cela 
 s'explique par plusieurs facteurs, notamment la difficulté du modèle à généraliser aux nouveaux mots inconnus.
 
-\textbf{mettre les résultats de test}
+
+\begin{table}
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        Nom du modèle & crossentropy & accuracy micro & accuracy macro \\
+        \hline
+        \textit{GET\_POS} & 0.204 & 0.944 & 0.816\\
+        \hline
+    \end{tabular}
+    \caption{Résultats du modèle \textit{GET\_POS} sur la base de données de teste.}
+    \label{tab:test getpos}
+\end{table}
 
 \subsection{Résultats la prédiction des \textit{morphy}}
 
@@ -214,66 +245,99 @@ s'explique par plusieurs facteurs, notamment la difficulté du modèle à géné
     \centering
     \begin{subfigure}{0.32\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{../logs/get_morphy_French_0/crossentropy.png}
+        \includegraphics[width=\linewidth]{../logs/supertag/crossentropy.png}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{../logs/get_morphy_French_0/acc micro.png}
+        \includegraphics[width=\linewidth]{../logs/supertag/acc micro.png}
     \end{subfigure}
     \begin{subfigure}{0.32\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{../logs/get_morphy_French_0/allgood.png}
+        \includegraphics[width=\linewidth]{../logs/supertag/allgood.png}
     \end{subfigure}
     \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs 
             pour le modèle \textit{SUPERTAG}.}
     \label{fig: results supertag}
 \end{figure}
 
-Les courbes de loss témoignent d'un entraînement efficient. Cependant, les courbes d'accuracy montrent que les performances ne s'améliorent pas de la même manière que la loss. Les courbes témoignent même d'une amélioration linéaire plutôt qu'exponentielle. D'autre part, la tendance des performances d'accuracy entre validation et entraînement reste la même, et il n'y a pas d'écart qui se creuse au fil des epochs entre les deux courbes, donc il n'y a pas de surapprentissage. On peut expliquer la meilleure performance de la validation par rapport à l'entraînement par l'utilisation du dropout dans l'apprentissage. Cette méthode est présente lors de l'entraînement, ce qui va naturellement baisser ses performances. 
-Néanmoins, l'accuracy micro est plus stable que l'accuracy allgood lorsqu'on considère les classes séparemment dans le calcul de l'accuracy, où l'écart entre validation et entraînement se creuse aux dernières epochs. L'amélioration des performances n'est donc pas égale au fil des dernières epochs entre les différentes classes.
+% Les courbes de loss témoignent d'un entraînement efficient. Cependant, les courbes d'accuracy montrent que les performances ne
+% s'améliorent pas de la même manière que la loss. Les courbes témoignent même d'une amélioration linéaire plutôt qu'exponentielle.
+% D'autre part, la tendance des performances d'accuracy entre validation et entraînement reste la même, et il n'y a pas d'écart qui
+% se creuse au fil des epochs entre les deux courbes, donc il n'y a pas de overfitting. On peut expliquer la meilleure performance
+% de la validation par rapport à l'entraînement par l'utilisation du dropout dans l'apprentissage. Cette méthode est présente lors
+% de l'entraînement, ce qui va naturellement baisser ses performances. 
+% Néanmoins, l'accuracy micro est plus stable que l'accuracy \textit{allgood} lorsqu'on considère les classes séparément dans le
+% calcul de l'accuracy, où l'écart entre validation et entraînement se creuse aux dernières epochs. L'amélioration des performances
+% n'est donc pas égale au fil des dernières epochs entre les différentes classes.
 
 
-\begin{figure}[H]
+% \begin{figure}[H]
+%     \centering
+%     \begin{subfigure}{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/crossentropy.png}
+%     \end{subfigure}
+%     \begin{subfigure}{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/acc micro.png}
+%     \end{subfigure}
+%     \begin{subfigure}{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/allgood.png}
+%     \end{subfigure}
+%     \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs 
+%             pour le modèle \textit{SEPARATE}.}
+%     \label{fig: results separate}
+% \end{figure}
+
+% La modèle \textit{SEPARATE} permet de corréler les performances traduites par la loss et par l'accuracy micro. En effet, on retrouve
+% les caractéristiques entre validation et entraînement dans l'accuracy micro décrite précédemment, mais cette fois la tendance des
+% courbes est exponentielle. Ainsi, l'apprentissage selon la performance d'accuracy générée par agrégation de toutes les classes est
+% tout aussi efficace que celle traduite par la loss. Cependant, l'accuracy \textit{allgood} reste "linéaire" avec un écart entre
+% validation et entraînement qui se creuse au fil des epochs.  
+
+% \begin{figure}[H]
+%     \centering
+%     \begin{subfigure}{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_5/crossentropy.png}
+%     \end{subfigure}
+%     \begin{subfigure}{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_5/acc micro.png}
+%     \end{subfigure}
+%     \begin{subfigure}{0.32\textwidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_5/allgood.png}
+%     \end{subfigure}
+%     \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs 
+%             pour le modèle \textit{FUSION}.}
+%     \label{fig: results fusion}
+% \end{figure}
+
+% Le modèle \textit{FUSION} témoigne d'un apprentissage instable, qui se traduit notamment lors de l'étape de validation. En effet,
+% ce phénomène est souligné notamment avec la légère augmentation de la loss de validation qui appuie l'instabilité de la validation. 
+
+
+\begin{table}[H]
     \centering
-    \begin{subfigure}{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/crossentropy.png}
-    \end{subfigure}
-    \begin{subfigure}{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/acc micro.png}
-    \end{subfigure}
-    \begin{subfigure}{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/allgood.png}
-    \end{subfigure}
-    \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs 
-            pour le modèle \textit{SEPARATE}.}
-    \label{fig: results separate}
-\end{figure}
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+         Nom du modèle & crossentropy & accuracy micro & all good\\
+         \hline
+         \textit{BASELINE}& - & 0.980 & 0.791 \\
+         \hline
+         \textit{SUPERTAG}& 1.700 & 0.436 & 0.002\\
+         \hline
+         \textit{SEPARATE}&  &  & \\
+         \hline
+         \textit{FUSION}&  &  & \\
+         \hline
+    \end{tabular}
+    \caption{Résultats de test sur la prédiction des \textit{morphy}}
+    \label{tab: test morphy}
+\end{table}
 
-La modèle \textit{SEPARATE} permet de corréler les performances traduites par la loss et par l'accuracy micro. En effet, on retrouve les caractéristiques entre validation et entraînement dans l'accuracy micro décrite précédemment, mais cette fois la tendance des courbes est exponentielle. Ainsi, l'apprentissage selon la performance d'accuracy générée par aggrégation de toutes les classes est tout aussi efficace que celle traduite par la loss. Cependant, l'accuracy allgood reste "linéaire" avec un écart entre vaidation et entraînement qui se creuse au fil des epochs.  
-
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_5/crossentropy.png}
-    \end{subfigure}
-    \begin{subfigure}{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_5/acc micro.png}
-    \end{subfigure}
-    \begin{subfigure}{0.32\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_5/allgood.png}
-    \end{subfigure}
-    \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs 
-            pour le modèle \textit{FUSION}.}
-    \label{fig: results fusion}
-\end{figure}
-
-Le modèle \textit{FUSION} témoigne d'un apprentissage instable, qui se traduit notamment lors de l'étape de validation. En effet, ce phénomène est souligné notamment avec la légère augmentation de la loss de validation qui appuie l'instabilité de la validation. 
 
 \section{Inférences}
 
