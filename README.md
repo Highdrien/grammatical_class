@@ -74,6 +74,7 @@ task:
         use_pos: true              # use POS to get MORPHY
 ```
 
+Then run the launch_train.py file to launch training of model with this configuration.
 
 # Morphological traits inference
 In the config.yaml file make sure you have this: 
@@ -89,6 +90,7 @@ task:
         use_pos: true              # use POS to get MORPHY
 ```
 
+Then run the launch_train.py file to launch training of model with this configuration.
 
 # Questions
 - est ce que le fait d'ajouter les données POS augmente le resultas
