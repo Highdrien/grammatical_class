@@ -47,7 +47,8 @@ Le but de ce projet est de faire un modèle de langage capable de prédire les m
 
 Nous allons aussi nous demander si est-ce que le fait d'ajouter un prétraitement de la phrase va améliorer
 les performances. L'idée de ce prétraitement est de faire prédire le balisage de séquence
-prototypique (\textit{pos}) des mots, comme le montre la Figure~\ref{fig: example pos}.
+prototypique (\textit{pos}) des mots, comme le montre la Figure~\ref{fig: example pos}. L'ensemble des \textit{pos} 
+sont recensé dans les Annexes (section~\ref{sec: Annexes}).
 
 \begin{figure}[H]
     \centering
@@ -260,63 +261,63 @@ s'explique par plusieurs facteurs, notamment la difficulté du modèle à géné
     \label{fig: results supertag}
 \end{figure}
 
-% Les courbes de loss témoignent d'un entraînement efficient. Cependant, les courbes d'accuracy montrent que les performances ne
-% s'améliorent pas de la même manière que la loss. Les courbes témoignent même d'une amélioration linéaire plutôt qu'exponentielle.
-% D'autre part, la tendance des performances d'accuracy entre validation et entraînement reste la même, et il n'y a pas d'écart qui
-% se creuse au fil des epochs entre les deux courbes, donc il n'y a pas de overfitting. On peut expliquer la meilleure performance
-% de la validation par rapport à l'entraînement par l'utilisation du dropout dans l'apprentissage. Cette méthode est présente lors
-% de l'entraînement, ce qui va naturellement baisser ses performances. 
-% Néanmoins, l'accuracy micro est plus stable que l'accuracy \textit{allgood} lorsqu'on considère les classes séparément dans le
-% calcul de l'accuracy, où l'écart entre validation et entraînement se creuse aux dernières epochs. L'amélioration des performances
-% n'est donc pas égale au fil des dernières epochs entre les différentes classes.
+Les courbes de loss témoignent d'un entraînement efficient. Cependant, les courbes d'accuracy montrent que les performances ne
+s'améliorent pas de la même manière que la loss. Les courbes témoignent même d'une amélioration linéaire plutôt qu'exponentielle.
+D'autre part, la tendance des performances d'accuracy entre validation et entraînement reste la même, et il n'y a pas d'écart qui
+se creuse au fil des epochs entre les deux courbes, donc il n'y a pas de overfitting. On peut expliquer la meilleure performance
+de la validation par rapport à l'entraînement par l'utilisation du dropout dans l'apprentissage. Cette méthode est présente lors
+de l'entraînement, ce qui va naturellement baisser ses performances. 
+Néanmoins, l'accuracy micro est plus stable que l'accuracy \textit{allgood} lorsqu'on considère les classes séparément dans le
+calcul de l'accuracy, où l'écart entre validation et entraînement se creuse aux dernières epochs. L'amélioration des performances
+n'est donc pas égale au fil des dernières epochs entre les différentes classes.
 
 
-% \begin{figure}[H]
-%     \centering
-%     \begin{subfigure}{0.32\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/crossentropy.png}
-%     \end{subfigure}
-%     \begin{subfigure}{0.32\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/acc micro.png}
-%     \end{subfigure}
-%     \begin{subfigure}{0.32\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/allgood.png}
-%     \end{subfigure}
-%     \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs 
-%             pour le modèle \textit{SEPARATE}.}
-%     \label{fig: results separate}
-% \end{figure}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/separate/crossentropy.png}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/separate/acc micro.png}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/separate/allgood.png}
+    \end{subfigure}
+    \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs 
+            pour le modèle \textit{SEPARATE}.}
+    \label{fig: results separate}
+\end{figure}
 
-% La modèle \textit{SEPARATE} permet de corréler les performances traduites par la loss et par l'accuracy micro. En effet, on retrouve
-% les caractéristiques entre validation et entraînement dans l'accuracy micro décrite précédemment, mais cette fois la tendance des
-% courbes est exponentielle. Ainsi, l'apprentissage selon la performance d'accuracy générée par agrégation de toutes les classes est
-% tout aussi efficace que celle traduite par la loss. Cependant, l'accuracy \textit{allgood} reste "linéaire" avec un écart entre
-% validation et entraînement qui se creuse au fil des epochs.  
+La modèle \textit{SEPARATE} permet de corréler les performances traduites par la loss et par l'accuracy micro. En effet, on retrouve
+les caractéristiques entre validation et entraînement dans l'accuracy micro décrite précédemment, mais cette fois la tendance des
+courbes est exponentielle. Ainsi, l'apprentissage selon la performance d'accuracy générée par agrégation de toutes les classes est
+tout aussi efficace que celle traduite par la loss. Cependant, l'accuracy \textit{allgood} reste "linéaire" avec un écart entre
+validation et entraînement qui se creuse au fil des epochs.  
 
-% \begin{figure}[H]
-%     \centering
-%     \begin{subfigure}{0.32\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_5/crossentropy.png}
-%     \end{subfigure}
-%     \begin{subfigure}{0.32\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_5/acc micro.png}
-%     \end{subfigure}
-%     \begin{subfigure}{0.32\textwidth}
-%         \centering
-%         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_5/allgood.png}
-%     \end{subfigure}
-%     \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs 
-%             pour le modèle \textit{FUSION}.}
-%     \label{fig: results fusion}
-% \end{figure}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/fusion/crossentropy.png}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/fusion/acc micro.png}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/fusion/allgood.png}
+    \end{subfigure}
+    \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs 
+            pour le modèle \textit{FUSION}.}
+    \label{fig: results fusion}
+\end{figure}
 
-% Le modèle \textit{FUSION} témoigne d'un apprentissage instable, qui se traduit notamment lors de l'étape de validation. En effet,
-% ce phénomène est souligné notamment avec la légère augmentation de la loss de validation qui appuie l'instabilité de la validation. 
+Le modèle \textit{FUSION} témoigne d'un apprentissage instable, qui se traduit notamment lors de l'étape de validation. En effet,
+ce phénomène est souligné notamment avec la légère augmentation de la loss de validation qui appuie l'instabilité de la validation. 
 
 
 \begin{table}[H]
@@ -329,9 +330,9 @@ s'explique par plusieurs facteurs, notamment la difficulté du modèle à géné
          \hline
          \textit{SUPERTAG}& 1.700 & 0.436 & 0.002\\
          \hline
-         \textit{SEPARATE}&  &  & \\
+         \textit{SEPARATE}& 1.70 & 0.893 & 0.046\\
          \hline
-         \textit{FUSION}&  &  & \\
+         \textit{FUSION}& 1.698 & 0.884 & 0.154 \\
          \hline
     \end{tabular}
     \caption{Résultats de test sur la prédiction des \textit{morphy}}
