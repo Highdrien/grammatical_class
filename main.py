@@ -8,7 +8,7 @@ from typing import Optional
 from src.train import train
 from src.test import test
 from src.infer import infer
-from baseline.baseline_benchmark import test_dictionary
+from src.baseline.baseline_benchmark import test_dictionary
 from config.process_config import process_config
 
 
@@ -46,7 +46,6 @@ def main(options: dict) -> None:
         train(config)
     
     if options['mode'] == 'baseline':
-        config = load_config(options['config_path'])
         test_dictionary()
     
     if options['mode'] == 'test':

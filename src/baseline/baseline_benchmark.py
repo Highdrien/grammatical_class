@@ -59,7 +59,10 @@ def test_dictionary() -> dict[str,str]:
         # y_pred et y_true de shape 1, 10, 28, 13
         baseline_metrics += metrics.compute(y_true=y_true_encoding, y_pred=y_pred_encoding)
     baseline_metrics = baseline_metrics / n
+
     ic(baseline_metrics)
+    for i in range(len(metrics_name)):
+        print(f"{metrics_name[i]} :\t{baseline_metrics[i]:.3f}")
     return baseline_metrics
 
 
