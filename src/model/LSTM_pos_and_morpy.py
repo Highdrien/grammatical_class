@@ -226,10 +226,14 @@ class MorphPosLSTMClassifier(nn.Module):
         for i in range(self.num_classes):
             logits_i = self.morph[i](x)
             if self.add_zero:
-                zeros = torch.zeros((B, K, self.max_num_possibility - self.num_c_possibility[i]),
-                                    dtype=torch.float32,
-                                    device=x.device)
-                logit_list.append(torch.concat([logits_i, zeros], dim=2))
+                padding = torch.full((B, K, self.max_num_possibility - self.num_c_possibility[i]),
+                                     fill_value=-1000,
+                                     dtype=torch.float32,
+                                     device=x.device)
+                # zeros = torch.zeros((B, K, self.max_num_possibility - self.num_c_possibility[i]),
+                #                     dtype=torch.float32,
+                #                     device=x.device)
+                logit_list.append(torch.concat([logits_i, padding], dim=2))
             else:
                 logit_list.append(logits_i)
         logits = torch.stack(logit_list, dim=2)

@@ -132,9 +132,12 @@ class MorphLSTMClassifier(nn.Module):
             logits_i = self.morph[i](x)
             if self.add_zero:
                 padding = torch.full((B, K, self.max_num_possibility - self.num_c_possibility[i]),
-                                     float('-inf'),
+                                     fill_value=-1000,
                                      dtype=torch.float32,
                                      device=x.device)
+                # zeros = torch.zeros((B, K, self.max_num_possibility - self.num_c_possibility[i]),
+                #                     dtype=torch.float32,
+                #                     device=x.device)
                 logit_list.append(torch.concat([logits_i, padding], dim=2))
             else:
                 logit_list.append(logits_i)
