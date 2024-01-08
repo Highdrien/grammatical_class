@@ -59,6 +59,32 @@ data:
    [['`I`', '`think`', '`,`', '`threfore`'], ['`I`', '`am`', '`.`', '`PAD`']]\
    if sequence_size is 4 and the completion character is '`PAD`'. 
 
+## Inference
+# Pos-tagging inference
+In the config.yaml file make sure you have this: 
+task options
+task:
+    task_name: get_pos     # task do to: must be get_pos or get_morphy
+    get_pos_info:
+        num_classes: 19         # number of POS classes
+    get_morphy_info:
+        num_classes: 28         # number of MORPHY classes
+        num_features: 13        # number of max classes possibility
+        use_pos: true              # use POS to get MORPHY
+
+
+
+# Morphological traits inference
+In the config.yaml file make sure you have this: 
+task options
+task:
+    task_name: get_pos     # task do to: must be get_pos or get_morphy
+    get_pos_info:
+        num_classes: 19         # number of POS classes
+    get_morphy_info:
+        num_classes: 28         # number of MORPHY classes
+        num_features: 13        # number of max classes possibility
+        use_pos: true              # use POS to get MORPHY
 
 
 # Questions
