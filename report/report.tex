@@ -200,6 +200,9 @@ correctement cette tâche d'étiquetage, comme le montre la figure suivante:
     \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs.}
 \end{figure}
 
+Les courbes de loss et d'accuracy décrivent un apprentissage efficient dès la 5e epoch. À partir de la 5e epoch, l'apprentissage stagne et si on s'étend à plus de 20 epochs, on risque de faire du surapprentissage, car l'écart entre les performances de l'entraînement et les performances de la validation commence à se creuser. 
+L'accuracy micro est meilleure que l'accuracy macro, ce qui signifie que si les performances de toutes les classes confondues sont meilleures que si on cherche à quantifier les performances globales à partir de chaque classe séparément, traitée de manière égale.
+
 On constate que la valeur de l'accuracy de validation est un peu plus faible que celle d'entraînement, cela 
 s'explique par plusieurs facteurs, notamment la difficulté du modèle à généraliser aux nouveaux mots inconnus.
 
@@ -226,6 +229,9 @@ s'explique par plusieurs facteurs, notamment la difficulté du modèle à géné
     \label{fig: results supertag}
 \end{figure}
 
+Les courbes de loss témoignent d'un entraînement efficient. Cependant, les courbes d'accuracy montrent que les performances ne s'améliorent pas de la même manière que la loss. Les courbes témoignent même d'une amélioration linéaire plutôt qu'exponentielle. D'autre part, la tendance des performances d'accuracy entre validation et entraînement reste la même, et il n'y a pas d'écart qui se creuse au fil des epochs entre les deux courbes, donc il n'y a pas de surapprentissage. On peut expliquer la meilleure performance de la validation par rapport à l'entraînement par l'utilisation du dropout dans l'apprentissage. Cette méthode est présente lors de l'entraînement, ce qui va naturellement baisser ses performances. 
+Néanmoins, l'accuracy micro est plus stable que l'accuracy allgood lorsqu'on considère les classes séparemment dans le calcul de l'accuracy, où l'écart entre validation et entraînement se creuse aux dernières epochs. L'amélioration des performances n'est donc pas égale au fil des dernières epochs entre les différentes classes.
+
 
 \begin{figure}[H]
     \centering
@@ -246,6 +252,8 @@ s'explique par plusieurs facteurs, notamment la difficulté du modèle à géné
     \label{fig: results separate}
 \end{figure}
 
+La modèle \textit{SEPARATE} permet de corréler les performances traduites par la loss et par l'accuracy micro. En effet, on retrouve les caractéristiques entre validation et entraînement dans l'accuracy micro décrite précédemment, mais cette fois la tendance des courbes est exponentielle. Ainsi, l'apprentissage selon la performance d'accuracy générée par aggrégation de toutes les classes est tout aussi efficace que celle traduite par la loss. Cependant, l'accuracy allgood reste "linéaire" avec un écart entre vaidation et entraînement qui se creuse au fil des epochs.  
+
 \begin{figure}[H]
     \centering
     \begin{subfigure}{0.32\textwidth}
@@ -265,6 +273,7 @@ s'explique par plusieurs facteurs, notamment la difficulté du modèle à géné
     \label{fig: results fusion}
 \end{figure}
 
+Le modèle \textit{FUSION} témoigne d'un apprentissage instable, qui se traduit notamment lors de l'étape de validation. En effet, ce phénomène est souligné notamment avec la légère augmentation de la loss de validation qui appuie l'instabilité de la validation. 
 
 \section{Inférences}
 
