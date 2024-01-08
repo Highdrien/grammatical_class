@@ -1,3 +1,4 @@
+import sys
 import torch
 from torch import Tensor
 import torch.nn as nn
@@ -6,6 +7,11 @@ from icecream import ic
 from easydict import EasyDict
 import yaml
 import os
+from os.path import dirname as up
+
+sys.path.append(up(os.path.abspath(__file__)))
+sys.path.append(up(up(os.path.abspath(__file__))))
+sys.path.append(up(up(up(os.path.abspath(__file__)))))
 
 from typing import List, Union, Iterator, Tuple, Optional
 from torch.nn.parameter import Parameter
@@ -155,6 +161,9 @@ class MorphPosLSTMClassifier(nn.Module):
         #load weights
         load_checkpoint(model,pos_config,device='cuda')
         self.pos_model = model
+
+        for param in self.pos_model.parameters():
+            param.requires_grad = False
         
     
         print("model loaded:", model)
@@ -258,21 +267,21 @@ if __name__ == '__main__':
                                 num_c_possibility=NUN_C_POSSIBILITY,
                                 dropout=0.1,
                                 add_zero=False,
-                                pos_config="logs/get_morphy_lstm_French_0"
+                                pos_config="logs/get_pos_French"
                                 )
     
     print(model)
 
     for name, param in model.named_parameters():
-        print(name, param.shape, param.device)
+        print(name, param.shape, param.device, param.requires_grad)
 
     print(model.get_number_parameters())
 
-    x = torch.randint(low=0, high=67814, size=(2048, 10))
+    # x = torch.randint(low=0, high=67814, size=(2048, 10))
 
-    print(x.shape, x.device)
+    # print(x.shape, x.device)
 
-    y = model.forward(x=x)
-    print(y.shape)
+    # y = model.forward(x=x)
+    # print(y.shape)
 
     
