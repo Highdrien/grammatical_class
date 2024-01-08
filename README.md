@@ -80,7 +80,7 @@ In the config.yaml file make sure you have this:
 ```yaml
 task options
 task:
-    task_name: get_pos     # task do to: must be get_pos or get_morphy
+    task_name: get_morphy     # task do to: must be get_pos or get_morphy
     get_pos_info:
         num_classes: 19         # number of POS classes
     get_morphy_info:
