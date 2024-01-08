@@ -61,7 +61,8 @@ prototypique (\textit{pos}) des mots, comme le montre la Figure~\ref{fig: exampl
 
 Nous avons utilisé le dataset Universal Dependencies 2.13 ~\cite{11234/1-5287}, qui comporte 146 langues dont l'anglais
 et le français. Dans ce projet, nous nous sommes seulement concentrés sur le français.
-\textbf{dire combien il y a de phrase et de mots en français}. Ce dataset possède des phrases, la liste de mots composant ses phrases,
+Le dataset en français contients un ensemble de 47498 phrases, avec 849476 mots, et 76048 mots unique.
+Ce dataset possède des phrases, la liste de mots composant ses phrases,
 et les \textit{pos} et \textit{morphy} qui sont associés à chacun de ses mots. Au total, nous avons recensé $19$ \textit{pos} et $28$ \textit{morphy} différents.
 
 \subsection{Padding}
@@ -107,8 +108,16 @@ des mots. Les données passent alors dans une couche LSTM bidirectionnel, puis d
 avec une sortie à 19 éléments représentant les probabilité de chaque classe \textit{pos}. Nous avons utilisé du 
 dropout sur les neurones des couches LSTM et dense, avec un taux d'oublie de $1\%$. Entre ces 3 couches, nous avons 
 aussi ajouté la fonciton d'activation ReLU~\cite{DBLP:journals/corr/abs-1803-08375}. Nous avons utilisé la CrossentropyLoss 
-comme fonction de coût, l'optimizer Adam~\cite{kingma2014adam}.
-\textbf{mettre une image du modèle avec draw.io par exemple}
+comme fonction de coût, l'optimizer Adam~\cite{kingma2014adam}. Ce modèle est représenté sur la Figure~\ref{fig: model getpos}.
+Nons avons donc en entrée une matrice de taille $B \times K$, contenant l'indices des mots, où $B$ est la taille du batch.
+ Et le modèle retourne un tensor de taille $B \times K \times 19$, contenant les probabilités des \textit{pos} pour chaque mot.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{get_pos.png}
+    \caption{Modèle \textit{GET\_POS}}
+    \label{fig: model getpos}
+\end{figure} 
 
 \subsection{Architecture des \textit{morphy}}
 Pour la tâche de prédiction des traits morphologiques, la difficulté est supérieure. En effet pour cette tâche 
@@ -128,12 +137,20 @@ La fonction de coût utilisé est toujours la CrossentropyLoss mais elle est app
 classe puis ensuite moyennée pour obtenir la valeur de loss globale.
 
 
+\section{Métriques}
 
-\section{Résultats et métriques}
+Pour pouvoir mesurer les performances de ces modèles nous avons mis en place plusieurs métriques. Pour la prédiction de 
+\textit{pos}, nous avons utlisé l'accuracy micro et macro. La première nous donne l'accuracy de la prédiction, et la deuxième
+nous donne la moyenne de l'accuracy sur chacune des classes. 
 
-\todo{Métriques}
+Pour la prédiction de \textit{morphy}, nous avons aussi utilisé l'accuracy micro, et nous avons aussi implémenté une 
+metrique qu'on a appelée \textit{all good}, qui fait la moyenne des mots dont la prédiction de tous les \textit{morphy}
+sont juste. Si la métrique vaut $0.2$, cela veux dire qu'il y a 1 mots sur 5, qui dont la prédiction est totalement bonne.
 
-\subsection{Résultats et métriques pour le \textit{pos}-tagging}
+
+\section{Résultats}
+
+\subsection{Résultats pour la prédiction de \textit{pos}}
 Nous avons donc lancé un entraînement de notre réseau LSTM-Bidirectionel sur 30 epochs pour le \textit{pos}-tagging et 
 nous avons obtenu une accuracy de validation d'environ 90\% ce qui dénote que le réseau à réussi à apprendre 
 correctement cette tâche d'étiquetage, comme le montre la figure suivante:
@@ -157,7 +174,7 @@ correctement cette tâche d'étiquetage, comme le montre la figure suivante:
 On constate que la valeur de l'accuracy de validation est un peu plus faible que celle d'entraînement, cela 
 s'explique par plusieurs facteurs, notamment la difficulté du modèle à généraliser aux nouveaux mots inconnus.
 
-\subsection{Résultats et métriques pour la prédiction des traits morphologiques}
+\subsection{Résultats la prédiction des \textit{morphy}}
 
 La tâche de prédiction des traits morphologiques comporte une subtilité: toutes les classes n'ont pas le même 
 nombre d'attributs. Par exemple la classe "VERB" a 5 attributs tandis que la classe "NOUN" en a 12. Or, le 
