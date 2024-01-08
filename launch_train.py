@@ -16,7 +16,7 @@ def load_config(path: str) -> EasyDict:
 
 
 def main() -> None:
-    config = load_config(os.path.join('config', 'config_sep.yaml'))
+    config = load_config(os.path.join('config', 'config.yaml'))
     process_config(config)
     train(config)
 
