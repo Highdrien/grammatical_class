@@ -7,8 +7,7 @@
 \usepackage{amssymb}    % pour les symboles de maths comme \mathbb{R}
 \usepackage{mathtools}  % pour rajouter \text dans un environment math
 \usepackage{subcaption} % pour les subfigures
-\usepackage{todonotes} 
-\usepackage{float}
+\usepackage{float}      % truc pour mettre les images à la bonne place
 \usepackage[style=ieee]{biblatex}
 \addbibresource{ref.bib}
 \bibliography{ref.bib}
@@ -17,7 +16,7 @@
     colorlinks=true,
     linkcolor=blue,   % Couleur des liens internes (table des matières, références)
     citecolor=green,  % Couleur des liens vers les références bibliographiques
-    filecolor=magenta, % Couleur des liens vers les fichiers
+    filecolor=magenta,% Couleur des liens vers les fichiers
     urlcolor=blue     % Couleur des liens vers les URL
 }
 
@@ -29,7 +28,9 @@
 \begin{document}
 
 \maketitle
+\bigskip
 \tableofcontents
+\newpage
 
 \section{Introduction}
 
@@ -124,21 +125,44 @@ Nons avons donc en entrée une matrice de taille $B \times K$, contenant l'indic
 Pour la tâche de prédiction des traits morphologiques, la difficulté est supérieure. En effet pour cette tâche 
 il faut pour chaque mot de la phrase prédire à la fois son rôle dans la phrase (Verbe, Nom, ect..) mais aussi 
 pour chacune de ses classes prédire des attributs (singulier, pluriel, ...). Nous avons donc crée plusieurs 
-architecture différentes que nous allons présenter.
+architecture différentes que nous allons présenter. Nous avons aussi du modifier la fonciton de coût par 
+la moyenne des crossentropy sur les 28 \textit{morphy} différents. Nous avons utilisé l'optimizer Adam~\cite{kingma2014adam},
+et avons ajouté un gradient decay, qui fait que le learning rate est divisé par deux lors des épochs 10 et 20.
 
 \subsubsection{Modèle \textit{SUPERTAG}}
 
 Le modèle commence par une couche d'embedding pour deux couches de LSTM bidirectionnel. Ensuite on fait passer les données 
-dans 3 couches dense caché dont la dernière contients $364$ neurones. Avant que nos données sorte du modèles, elles ont une
+dans 3 couches dense caché dont la dernière contients $364$ neurones
+\footnote{Nous avons pris $364$ neurones car $364 = 28 \times 13$.}
+Avant que nos données sorte du modèles, elles ont une
 taille de $B \times B \times 364$. On \textit{reshape} alors les données pour avoir une sortie de taille 
 $B \times B \times 28 \times 13$. La Figure~\ref{fig: model getmorphy} représente ce modèle.
 
-\begin{figure}[H]
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=0.8\textwidth]{get_morphy_supertag.png}
     \caption{Modèle \textit{SUPERTAG}}
     \label{fig: model getmorphy}
 \end{figure}
+
+\subsubsection{Modèle \textit{SEPARATE}}
+
+On reprends le même début que le model \textit{SUPERTAG} et l'on change la dernière couche. Au lieu de prédire tous les 
+\textit{morphy} en même temps avec une seule couche dense, on a avoir 28 couche dense (une par \textit{morphy}). Chaque couche
+va alors prédire les probabilités lié à son \textit{morphy}. On va alors ajouter à chaque prédiction des couche des $0$
+pour obtenir un vecteur de taille $13$ pour tous les mots. On va ensuite concaténer tous les résultats pour avec une sortir de 
+taille $B \times B \times 28 \times 13$. La Figure~\ref{fig: model separate} représente ce modèle.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{get_morphy_separate.png}
+    \caption{Modèle \textit{SEPARATE}.}
+    \label{fig: model separate}
+\end{figure}
+
+\subsubsection{Modèle \textit{FUSION}}
+
+ici on fusionne le model pos et le model separate.
 
 
 \section{Métriques}
@@ -161,107 +185,94 @@ correctement cette tâche d'étiquetage, comme le montre la figure suivante:
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}{0.45\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{../logs/get_pos_French/acc macro.png}
-        \caption{Valeurs de l'accuracy d'entraînement et de validation par epochs.}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}{0.32\textwidth}
         \centering
         \includegraphics[width=\linewidth]{../logs/get_pos_French/crossentropy.png}
-        \caption{Valeurs de la fonction de coût par epochs.}
     \end{subfigure}
-    \caption{Comparaison des récompenses cumulées sur 100 étapes}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/get_pos_French/acc micro.png}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/get_pos_French/acc macro.png}
+    \end{subfigure}
+    \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs.}
 \end{figure}
 
 On constate que la valeur de l'accuracy de validation est un peu plus faible que celle d'entraînement, cela 
 s'explique par plusieurs facteurs, notamment la difficulté du modèle à généraliser aux nouveaux mots inconnus.
 
+\textbf{mettre les résultats de test}
+
 \subsection{Résultats la prédiction des \textit{morphy}}
 
-La tâche de prédiction des traits morphologiques comporte une subtilité: toutes les classes n'ont pas le même 
-nombre d'attributs. Par exemple la classe "VERB" a 5 attributs tandis que la classe "NOUN" en a 12. Or, le 
-réseau ne
-peut pas prédire un vecteur de taille variable. Pour résoudre ce problème, nous avons donc décidé de rajouter 
-des attributs fictifs à certaines classes pour que toutes les classes aient le même nombre d'attributs. Pour 
-ce faire 
-deux solutions sont possibles: soit chacune des sous-couches dense du réseau a le même nombre de neurones, et 
-dans ce cas on rajoute des attributs fictifs et inutiles à certaines classe,
-soit on définit des couches dense de tailles différentes pour chaque classe égales au noombre d'attributs de 
-la classe, mais dans ce cas, il faut rajouter
-du padding à la sortie de la couche dense pour que toutes les sorties aient la même taille. Nous avons testé 
-les deux méthodes (qu'on appelera $"separate"$ pour la méthode sans padding et $"separate_0"$ pour la méthode 
-avec padding après couche et nous avons obtenu de meilleurs résultats avec la deuxième méthode:
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/get_morphy_French_0/crossentropy.png}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/get_morphy_French_0/acc micro.png}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/get_morphy_French_0/allgood.png}
+    \end{subfigure}
+    \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs 
+            pour le modèle \textit{SUPERTAG}.}
+    \label{fig: results supertag}
+\end{figure}
 
-Pour la tâche de prédiction des traits morphologiques avec la méthode $separate_0$, nous obtenons les résultats 
-suivants: %plot accuracy et crossentropy
 
 \begin{figure}[H]
     \centering
-    \begin{subfigure}{0.45\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/acc micro.png}
-        \caption{Valeurs de l'accuracy d'entraînement et de validation par epochs.}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}{0.32\textwidth}
         \centering
         \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/crossentropy.png}
-        \caption{Valeurs de la fonction de coût par epochs.}
     \end{subfigure}
-    \caption{Courbes d'accuracy et de crossentropy pour la tâche de prédiction des traits morphologiques}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/acc micro.png}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_0/allgood.png}
+    \end{subfigure}
+    \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs 
+            pour le modèle \textit{SEPARATE}.}
+    \label{fig: results separate}
 \end{figure}
-
-On mesure également une autre métrique appelée 'allgood' qui mesure le nombre de mots dont tous les attributs 
-ont été prédits correctement. On obtient une valeur de allgood de: VALEUR comme le
-montre la figure suivante:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.45\linewidth]{../logs/get_morphy_sep0_French_0/allgood.png}
-    \caption{Valeurs de la métrique allgood par epochs.}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_5/crossentropy.png}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_5/acc micro.png}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{../logs/get_morphy_sep0_French_5/allgood.png}
+    \end{subfigure}
+    \caption{Valeurs de la loss et des métriques d'entraînement et de validation en fonction des epochs 
+            pour le modèle \textit{FUSION}.}
+    \label{fig: results fusion}
 \end{figure}
 
 
-L'entraînement requiert un temps plus long que pour la tâche de \textit{pos}-tagging car il y a beaucoups plus 
-d'attributs à prédire.
-On obtient une accuracy de validation final de VALEUR, et les courbes montrent que le modèle subit un 
-léger sur-apprentissage (comme le montre la valeur de la loss de validation).
+\section{Inférences}
 
-Pour la tâche de prédiction des traits morphologiques avec la méthode $separate$, nous obtenons les 
-résultats suivants: %plot accuracy et crossentropy
+% \newpage
 
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}{0.45\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{../logs/get_morphy_separate_French_0/acc micro.png}
-        \caption{Valeurs de l'accuracy d'entraînement et de validation par epochs.}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.45\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{../logs/get_morphy_separate_French_0/crossentropy.png}
-        \caption{Valeurs de la fonction de coût par epochs.}
-    \end{subfigure}
-    \caption{Courbes d'accuracy et de crossentropy pour la tâche de prédiction des traits morphologiques}
-\end{figure}
+\section{Annexes}
 
-On constate que les résultats sont moins bons que pour la méthode $separate_0$ et que le modèle a besoin de 
-plus d'epochs. Cela s'explique par le fait que les attributs fictifs rajoutés aux classes 
-pour que toutes les classes aient le même nombre d'attributs sont des attributs inutiles qui n'apportent pas 
-d'information au modèle et qui peuvent donc le perturber.
-
-
-
-
-
-\todo{Mettre ici le graphe d'entraînement}
-\todo{Mettre ici des exemples d'inférences (un cas simple, un cas difficile ambigu}
-
-En revanche pour la tâche de prédiction des traits morphologiques les résultats se sont avérés bien inférieurs 
-avec une accuracy de validation de seulement 20\%.
+Mettre la liste des POS et MORPHY ici
 
 \newpage
 
