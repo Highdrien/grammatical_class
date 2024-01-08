@@ -17,7 +17,7 @@ Sentence = List[Word_Info]  # list of word info
 
 def create_dictionnaire(data: list[Sentence]) -> dict[str,str]:
     """
-    Crée un dictionnaire des mots de toutes les sentences de data associés à leur premier label rencontré
+    Crée un dictionnaire des mots de toutes les phrases de data associés à leur premier label rencontré
     """
     dico = {}
     for sentence in data:
@@ -28,7 +28,7 @@ def create_dictionnaire(data: list[Sentence]) -> dict[str,str]:
     return dico
 
 
-def attribution(dico: dict[str,str], sequence: list[Sentence]) -> list[str]:
+def prediction(dico: dict[str,str], sequence: list[Sentence]) -> list[str]:
     """
     Réalise une prédiction des classes des mots d'une séquence de sentences, 
     en attribuant au mot la classe correspondante dans le dictionnaire. 
@@ -40,12 +40,20 @@ def attribution(dico: dict[str,str], sequence: list[Sentence]) -> list[str]:
             if word in dico:
                 prediction.append(dico[word])
             else:
-                prediction.append("UNK")
+                prediction.append("<UNK>")
     return prediction
 
 
 def launch_baseline(config: EasyDict) -> None:
+    """
+    Lance le modèle baseline
+    """
     folders = get_sentences.get_foldersname_from_language(datapath="data", language="French")
     files = get_sentences.get_file_for_mode(folder_list=folders, mode="train")
     data = get_sentences.get_sentences(files=files, indexes=[1, 5])
     create_dictionnaire(data=data)
+
+
+if __name__ == "__main__":
+    config = EasyDict()
+    launch_baseline(config=config)

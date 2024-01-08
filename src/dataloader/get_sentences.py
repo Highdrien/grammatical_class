@@ -118,5 +118,16 @@ def get_all_label():
 
 
 if __name__ == '__main__':
-    # get_all_label()
-    pass
+    folders = get_foldersname_from_language(datapath='data', language='French')
+    files = get_file_for_mode(folder_list=folders, mode='test') + get_file_for_mode(folder_list=folders, mode='train') + get_file_for_mode(folder_list=folders, mode='val') 
+    data = get_sentences(files=files, indexes=[1])
+    count = 0
+    words = []
+    print(f'{len(data) = }')
+    for sequence in data:
+        count += len(sequence)
+        for word in sequence:
+            words.append(word[0])
+    print(f'{count = }')
+    print(f'nombre de mot unique {len(set(words))}')
+
