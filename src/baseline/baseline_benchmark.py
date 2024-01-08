@@ -1,11 +1,12 @@
 # Prendre toutes les phrases de test, et calculer l'accuracy du modèle baseline
 
 import torch
+import numpy as np
 from typing import List
 from icecream import ic
 from easydict import EasyDict
 import baseline_dictionary
-import src.metrics
+from src.metrics import MOR_Metrics
 from src.dataloader import get_sentences, convert_label
 
 
@@ -16,28 +17,48 @@ def test_dictionary(test_path: str, baseline_path: str) -> dict[str,str]:
     folders = get_sentences.get_foldersname_from_language(datapath="data", language="French")
     files = get_sentences.get_file_for_mode(folder_list=folders, mode="test")
     data = get_sentences.get_sentences(files=files, indexes=[1, 5])  # indexes for morphy
-    dico = baseline_dictionary.create_dictionnaire(data_path="data", language="French", mode="train")
+    # faire un get sequence
+    dico_train = baseline_dictionary.create_dictionnaire(data_path="data", language="French", mode="train")
     
+    config = {'data': {'sequence_length': 10},
+              'task': {'get_morphy_info': {'num_classes': 28},
+                       'task_name': 'get_morphy'},
+              'metrics': {'acc': True, 'allgood': True} }
     
-    metrics = get_metrics(config=config, device=device)
+    metrics = MOR_Metrics(config=EasyDict(config))
     metrics_name = metrics.get_metrics_name()
-    test_metrics = np.zeros((len(metrics_name)))
-    count_unk = 0
+    baseline_metrics = np.zeros((len(metrics_name)))
+
+    label_encoder = convert_label.Morphy()
+    unk_label = '_=Yes'
+
+    n = 0
+
     for sentence in data:
-        for word in sentence:
-            if word[0] in dico:
-                if dico[word[0]] == word[1]:
-                    test_loss += loss.item()
-            test_metrics += metrics.compute(y_true=y_true, y_pred=y_pred)
-                    count_accuracy += 1
-            else:
-                if word[1] == "<UNK>":
-                    count_unk += 1
-    print(f'{count_accuracy = }')
 
+        y_pred_sequence = []
+        y_true_sequence = []
 
-    test_metrics = test_metrics / n_test
-    return test_metrics
+        for word, y_true in sentence:
+            n += 1 
+            y_pred = dico_train[word] if word in dico_train else unk_label
+
+            y_pred_sequence.append(label_encoder.encode(label_to_convert=y_pred))
+            y_true_sequence.append(label_encoder.encode(label_to_convert=y_true))
+        
+        
+
+        y_true_encoding = torch.tensor([y_true_sequence])
+        y_pred_encoding = torch.tensor([y_pred_sequence])
+
+        # les faire passer en one-hot dim: -1
+        
+        # y_pred et y_true de shape 1, 10, 28, 13
+        baseline_metrics += metrics.compute(y_true=y_true_encoding, y_pred=y_pred_encoding)
+    
+
+    baseline_metrics = baseline_metrics / n
+    return baseline_metrics
 
 
 # 
