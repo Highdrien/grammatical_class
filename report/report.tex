@@ -120,21 +120,25 @@ Nons avons donc en entrée une matrice de taille $B \times K$, contenant l'indic
 \end{figure} 
 
 \subsection{Architecture des \textit{morphy}}
+
 Pour la tâche de prédiction des traits morphologiques, la difficulté est supérieure. En effet pour cette tâche 
 il faut pour chaque mot de la phrase prédire à la fois son rôle dans la phrase (Verbe, Nom, ect..) mais aussi 
-pour chacune de ses classes prédire des attributs (singulier, pluriel, ...).
+pour chacune de ses classes prédire des attributs (singulier, pluriel, ...). Nous avons donc crée plusieurs 
+architecture différentes que nous allons présenter.
 
-Pour cela une première méthode serait d'entraîner un modèle distinct par attributs, mais cela demanderai un 
-assez long temps d'entraînement. Nous avons donc opté pour une première méthode différente: prédire non pas un 
-vecteur comme pour la première tâche mais une matrice [classe,attribut] sans changer l'architecture du réseau, 
-simplement en changeant le nombre de neurones de la couche dense. Nous avons par la suite tenté une deuxième 
-approche: diviser la sortie de la couche dense en la faisant passer dans un nombre n de couche dense égal au 
-nombre de classes, chacune chargée de prédire un attribut et reformer la matrice après passage dans ces couches 
-distinctes. L'intéret de cette approche est que l'on utilise les features extraites du bloc LSTM de manière 
-commune pour les sous-tâches mais chaque sous-tâche de classification est réalisé par une couche dense distincte.
+\subsubsection{Modèle \textit{SUPERTAG}}
 
-La fonction de coût utilisé est toujours la CrossentropyLoss mais elle est appliquée cette fois-ci classe par 
-classe puis ensuite moyennée pour obtenir la valeur de loss globale.
+Le modèle commence par une couche d'embedding pour deux couches de LSTM bidirectionnel. Ensuite on fait passer les données 
+dans 3 couches dense caché dont la dernière contients $364$ neurones. Avant que nos données sorte du modèles, elles ont une
+taille de $B \times B \times 364$. On \textit{reshape} alors les données pour avoir une sortie de taille 
+$B \times B \times 28 \times 13$. La Figure~\ref{fig: model getmorphy} représente ce modèle.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{get_morphy_supertag.png}
+    \caption{Modèle \textit{SUPERTAG}}
+    \label{fig: model getmorphy}
+\end{figure}
 
 
 \section{Métriques}
