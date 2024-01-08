@@ -1,12 +1,15 @@
-# 1. Dictionnaire : mot -> premier label rencontré
-# 2. Attribuer les labels à chaque mot de la séquence
-# Si mot OOV -> UNK
+import os
+import sys
+from os.path import dirname as up
 
-import torch
+sys.path.append(up(os.path.abspath(__file__)))
+sys.path.append(up(up(os.path.abspath(__file__))))
+sys.path.append(up(up(up(os.path.abspath(__file__)))))
+
 from typing import List
 from icecream import ic
 from easydict import EasyDict
-from src.dataloader.vocabulary import save_vocab
+import src.dataloader.vocabulary as vocabulary
 
 import src.dataloader.get_sentences as get_sentences
 
@@ -28,7 +31,7 @@ def create_dictionnaire(data_path: str, language: str, mode: str) -> dict[str,st
         for word in sentence:
             if word[0] not in dico:
                 dico[word[0]] = word[1]
-    save_vocab(dico, "dictionary/baseline.json")
+    vocabulary.save_vocab(dico, "dictionary/baseline.json")
     return dico
 
 
@@ -43,7 +46,7 @@ def prediction(dico: dict[str,str], sequence: list[Sentence]) -> list[str]:
         for word in sentence:
             if word in dico:
                 prediction.append(dico[word])
-                
+
             else:
                 prediction.append("<UNK>")
     return prediction
