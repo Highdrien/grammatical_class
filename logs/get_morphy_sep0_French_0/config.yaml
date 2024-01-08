@@ -25,6 +25,7 @@ task:
     get_morphy_info:
         num_classes: 28
         num_features: 13
+        use_pos: false
 
 # model options
 model:
