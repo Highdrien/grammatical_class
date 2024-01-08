@@ -30,6 +30,9 @@ def test(config: EasyDict, logging_path: str) -> None:
     model = model.to(device)
     checkpoint_path = os.path.join(logging_path, 'checkpoint.pt')
     assert os.path.isfile(checkpoint_path), f'Error: model weight was not found in {checkpoint_path}'
+    # checkpoint = torch.load(checkpoint_path, map_location=device)
+    # ic(checkpoint.keys())
+    # exit()
     model.load_state_dict(torch.load(checkpoint_path, map_location=device))
     ic(model)
     ic(model.get_number_parameters())

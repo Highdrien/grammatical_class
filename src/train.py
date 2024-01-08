@@ -35,6 +35,7 @@ def train(config: EasyDict) -> None:
     model = model.to(device)
     ic(model)
     ic(model.get_number_parameters())
+    ic(model.state_dict().keys())
     
     # Loss
     criterion = torch.nn.CrossEntropyLoss(reduction='mean')

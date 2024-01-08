@@ -159,7 +159,7 @@ class MorphLSTMClassifier(nn.Module):
     
     def state_dict(self):
         output = {}
-        param_in_list = {'weight': [], 'bias': []}
+        param_in_list: dict[str, List[Tensor]] = {'weight': [], 'bias': []}
 
         for name, param in self.named_parameters():
             param = param.to('cpu')
@@ -169,21 +169,22 @@ class MorphLSTMClassifier(nn.Module):
                 param_in_list[name].append(param)
         
         for name, value in param_in_list.items():
-            output[name] = torch.stack(value)
+            for i in range(len(value)):
+                output[f'{name}_{i}'] = value[i]
         
         return output
 
     def load_state_dict(self, state_dict: Mapping[str, Any], strict: bool = False):
         error = super().load_state_dict(state_dict, strict=False)
-        if len(error.missing_keys) != 0:
-            ic(error)
-        
-        if error.unexpected_keys != ['weight', 'bias']:
-            ic(error)
+        if error.missing_keys != []:
+            raise ValueError('erreur de corespondance entre les poids')
+
+        if len(error.unexpected_keys) != 2 * self.num_classes:
+            raise ValueError('erreur de corespondance entre les poids')
 
         for i in range(self.num_classes):
-            self.morph[i].weight = torch.nn.Parameter(state_dict['weight'][i])
-            self.morph[i].bias = torch.nn.Parameter(state_dict['bias'][i])
+            self.morph[i].weight = torch.nn.Parameter(state_dict[f'weight_{i}'])
+            self.morph[i].bias = torch.nn.Parameter(state_dict[f'bias_{i}'])
 
 
 

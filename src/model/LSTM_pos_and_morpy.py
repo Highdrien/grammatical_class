@@ -1,24 +1,24 @@
+import os
 import sys
-import torch
-from torch import Tensor
-import torch.nn as nn
+import yaml
 from numpy import prod
 from icecream import ic 
 from easydict import EasyDict
-import yaml
-import os
+from typing import Mapping, Any, List, Union, Iterator, Tuple, Optional
 from os.path import dirname as up
+
+import torch
+from torch import Tensor
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn.parameter import Parameter
 
 sys.path.append(up(os.path.abspath(__file__)))
 sys.path.append(up(up(os.path.abspath(__file__))))
 sys.path.append(up(up(up(os.path.abspath(__file__)))))
 
-from typing import List, Union, Iterator, Tuple, Optional
-from torch.nn.parameter import Parameter
 from config.process_config import process_config
 from src.model.LSTM import LSTMClassifier
-import torch.nn.functional as F
-
 
 
 NUN_C_POSSIBILITY = [2, 2, 3, 5, 3, 4, 13, 2, 13, 5, 5, 5, 5, 2, 4, 2, 3, 4, 6, 3, 4, 5, 2, 3, 2, 2, 3, 4]
@@ -250,6 +250,36 @@ class MorphPosLSTMClassifier(nn.Module):
         for c in range(self.num_classes):
             self.morph[c] = self.morph[c].to(device)
         return self
+    
+    def state_dict(self):
+        output = {}
+        param_in_list: dict[str, List[Tensor]] = {'weight': [], 'bias': []}
+
+        for name, param in self.named_parameters():
+            param = param.to('cpu')
+            if name not in ['weight', 'bias']:
+                output[name] = param
+            else:
+                param_in_list[name].append(param)
+        
+        for name, value in param_in_list.items():
+            for i in range(len(value)):
+                output[f'{name}_{i}'] = value[i]
+        
+        return output
+
+    def load_state_dict(self, state_dict: Mapping[str, Any], strict: bool = False):
+        error = super().load_state_dict(state_dict, strict=False)
+        ic(error)
+        if error.missing_keys != []:
+            raise ValueError('erreur de corespondance entre les poids')
+
+        if len(error.unexpected_keys) != 2 * self.num_classes:
+            raise ValueError('erreur de corespondance entre les poids')
+
+        for i in range(self.num_classes):
+            self.morph[i].weight = torch.nn.Parameter(state_dict[f'weight_{i}'])
+            self.morph[i].bias = torch.nn.Parameter(state_dict[f'bias_{i}'])
 
 
 if __name__ == '__main__':
@@ -257,23 +287,25 @@ if __name__ == '__main__':
 
 
     model = MorphPosLSTMClassifier(num_words=67814,
-                                embedding_size=64,
-                                lstm_hidd_size_1=64,
-                                lstm_hidd_size_2=None,
-                                fc_hidd_size=[64],
-                                num_classes=19,
-                                bidirectional=True,
-                                activation='relu',
-                                num_c_possibility=NUN_C_POSSIBILITY,
-                                dropout=0.1,
-                                add_zero=False,
-                                pos_config="logs/get_pos_French"
-                                )
+                                   embedding_size=64,
+                                   lstm_hidd_size_1=64,
+                                   lstm_hidd_size_2=128,
+                                   fc_hidd_size=[128, 64],
+                                   num_classes=28,
+                                   bidirectional=True,
+                                   activation='relu',
+                                   num_c_possibility=NUN_C_POSSIBILITY,
+                                   dropout=0.1,
+                                   add_zero=True,
+                                   pos_config="logs/get_pos_French"
+                                   )
     
     print(model)
 
-    for name, param in model.named_parameters():
+    for name, param in model.state_dict().items():
         print(name, param.shape, param.device, param.requires_grad)
+
+    model.load_state_dict(model.state_dict())
 
     print(model.get_number_parameters())
 
