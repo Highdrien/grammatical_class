@@ -24,7 +24,7 @@ task:
     get_morphy_info:
         num_classes: 28         # number of MORPHY classes
         num_features: 13        # number of max classes possibility
-        use_pos: true              # use POS to get MORPHY
+        use_pos: false              # use POS to get MORPHY
 
 # model options
 model:
@@ -59,7 +59,7 @@ learning:
     learning_rate: 0.01
     milesstone: [10, 20]
     gamma: 0.5
-    epochs: 1
+    epochs: 70
     batch_size: 2048
     shuffle: true
     drop_last: true

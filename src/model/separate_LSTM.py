@@ -4,7 +4,7 @@ import torch.nn as nn
 from numpy import prod
 from icecream import ic 
 
-from typing import List, Union, Iterator, Tuple
+from typing import Any, List, Mapping, Union, Iterator, Tuple
 from torch.nn.parameter import Parameter
 
 NUN_C_POSSIBILITY = [2, 2, 3, 5, 3, 4, 13, 2, 13, 5, 5, 5, 5, 2, 4, 2, 3, 4, 6, 3, 4, 5, 2, 3, 2, 2, 3, 4]
@@ -155,6 +155,35 @@ class MorphLSTMClassifier(nn.Module):
         for c in range(self.num_classes):
             self.morph[c] = self.morph[c].to(device)
         return self
+    
+    def state_dict(self):
+        output = {}
+        param_in_list = {'weight': [], 'bias': []}
+
+        for name, param in self.named_parameters():
+            param = param.to('cpu')
+            if name not in ['weight', 'bias']:
+                output[name] = param
+            else:
+                param_in_list[name].append(param)
+        
+        for name, value in param_in_list.items():
+            output[name] = torch.stack(value)
+        
+        return output
+
+    def load_state_dict(self, state_dict: Mapping[str, Any], strict: bool = False):
+        error = super().load_state_dict(state_dict, strict=False)
+        if len(error.missing_keys) != 0:
+            ic(error)
+        
+        if error.unexpected_keys != ['weight', 'bias']:
+            ic(error)
+
+        for i in range(self.num_classes):
+            self.morph[i].weight = torch.nn.Parameter(state_dict['weight'][i])
+            self.morph[i].bias = torch.nn.Parameter(state_dict['bias'][i])
+
 
 
 if __name__ == '__main__':
@@ -163,7 +192,7 @@ if __name__ == '__main__':
                                 lstm_hidd_size_1=64,
                                 lstm_hidd_size_2=None,
                                 fc_hidd_size=[64],
-                                num_classes=19,
+                                num_classes=28,
                                 bidirectional=True,
                                 activation='relu',
                                 num_c_possibility=NUN_C_POSSIBILITY,
@@ -177,11 +206,18 @@ if __name__ == '__main__':
 
     print(model.get_number_parameters())
 
-    x = torch.randint(low=0, high=67814, size=(2048, 10))
+    # x = torch.randint(low=0, high=67814, size=(2048, 10))
 
-    print(x.shape, x.device)
+    # print(x.shape, x.device)
 
-    y = model.forward(x=x)
-    print(y.shape)
+    # y = model.forward(x=x)
+    # print(y.shape)
 
+    checkpoint = model.state_dict()
+
+    for name, param in checkpoint.items():
+        print(name, param.shape, param.device)
+    
+    model.load_state_dict(state_dict=checkpoint, strict=False)
+    
     
