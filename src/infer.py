@@ -23,6 +23,7 @@ def procces_data(config: EasyDict, txt_file: str) -> Union[List[str], torch.Tens
         f.close()
     
     data = data.split(' ')
+    ic(data)
 
     sequences = get_sequences.dummy_sequences(sentence=data,
                                               k=config.data.sequence_length,
@@ -67,7 +68,7 @@ def infer(config: EasyDict,
 
     y_pred = y_pred.to('cpu')
     output = decode_data(y_pred, task=config.task.task_name)
-    save_infer(output, data, dst_path=os.path.join(folder, f'{config.name}_pred.txt'), pad=config.data.pad)
+    save_infer(output, data, dst_path=os.path.join(folder, f'{config.name}_infer.txt'), pad=config.data.pad)
     
 
 def decode_data(y_pred: torch.Tensor, task: str) -> np.ndarray:
@@ -100,6 +101,8 @@ def save_infer(output: np.ndarray, data: List[str], dst_path: str, pad: str) -> 
     with open(file=dst_path, mode='w', encoding='utf8') as f:
         f.write(final_pred)
         f.close()
+    
+    print(f'infer was save in {dst_path}')
     
 
 
