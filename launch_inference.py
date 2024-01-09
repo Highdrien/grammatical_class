@@ -160,7 +160,7 @@ def inference(sentence: List[str],
         #convert indexes to POS
         output = find_POS(output)
 
-    if 'morphy' in experiment_path:
+    if 'separate' in experiment_path or 'fusion' in experiment_path or 'supertag' in experiment_path: #if the model is a morphy model
         print("shape of output:",output.shape)
 
         for i in range(len(sentence)):
@@ -176,13 +176,12 @@ def inference(sentence: List[str],
 
 if __name__ == '__main__':
     #load a dictionary
-    dictionary = load_dictionary("dictionary/English.json")
-    experiment_path = "logs/get_morphy_lstm_French_0"
-    #sentence in english
-    #sentence = ['i', 'need', 'a','dog', '.','But it aint','gonna','happen','.','I','dont','have','the','money','.']
-    #sentence in french
+    dictionary = load_dictionary("dictionary/French.json")
+    #define the experiment path
+    experiment_path = "logs/fusion"
+    #define a sentence on which we want to do inference
     sentence = ['je', 'veux', 'un','chien', '.','Mais ça','narrivera','pas','.','Je','nai','pas','argent','.']
-    #output: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1]
+    #run inference
     res=inference(sentence, dictionary, experiment_path)
     print("sentence:",sentence)
     print("POS:",res)

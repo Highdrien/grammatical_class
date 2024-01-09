@@ -59,8 +59,8 @@ data:
    [['`I`', '`think`', '`,`', '`threfore`'], ['`I`', '`am`', '`.`', '`PAD`']]\
    if sequence_size is 4 and the completion character is '`PAD`'. 
 
-## Inference
-# Pos-tagging inference
+## Model Training
+# Pos-tagging training
 In the config.yaml file make sure you have this: 
 ```yaml
 task options
@@ -76,7 +76,7 @@ task:
 
 Then run the launch_train.py file to launch training of model with this configuration.
 
-# Morphological traits inference
+# Morphological traits training
 In the config.yaml file make sure you have this: 
 ```yaml
 task options
@@ -92,7 +92,58 @@ task:
 
 Then run the launch_train.py file to launch training of model with this configuration.
 
-# Questions
-- est ce que le fait d'ajouter les données POS augmente le resultas
-- full tags ou non
-- comparer avec une baseline
+## Test 
+# Run test on pos-tagging
+
+
+To run inference using the [`launch_inference.py`](command:_github.copilot.openRelativePath?%5B%22launch_inference.py%22%5D "launch_inference.py") script, follow these steps:
+
+1. Ensure that you have a dictionary file in the [`dictionary/`](command:_github.copilot.openRelativePath?%5B%22dictionary%2F%22%5D "dictionary/") directory. For example, you might have a file named `French.json`.
+
+2. Set the [`experiment_path`](command:_github.copilot.openSymbolInFile?%5B%22launch_inference.py%22%2C%22experiment_path%22%5D "launch_inference.py") variable to the path of the experiment you want to run inference on. For example, you might set it to [`logs/get_pos_French`](command:_github.copilot.openRelativePath?%5B%22logs%2Fget_pos_French%22%5D "logs/get_pos_French").
+
+3. Define the [`sentence`](command:_github.copilot.openSymbolInFile?%5B%22launch_inference.py%22%2C%22sentence%22%5D "launch_inference.py") variable as a list of words for which you want to run inference. For example:
+
+```python
+sentence = ['je', 'veux', 'un','chien', '.','Mais ça','narrivera','pas','.','Je','nai','pas','argent','.']
+```
+
+4. Run the [`launch_inference.py`](command:_github.copilot.openRelativePath?%5B%22launch_inference.py%22%5D "launch_inference.py") script. The script will load the dictionary, run inference on the sentence using the specified experiment, and print the sentence and its part-of-speech tags.
+
+Here's an example of how to run the script:
+
+```sh
+python launch_inference.py
+```
+
+The output will look something like this:
+
+```
+sentence: ['je', 'veux', 'un', 'chien', '.', 'Mais ça', 'narrivera', 'pas', '.', 'Je', 'nai', 'pas', 'argent', '.']
+POS: ['PRON', 'VERB', 'DET', 'NOUN', 'PUNCT', 'CONJ', 'VERB', 'ADV', 'PUNCT', 'PRON', 'VERB', 'ADV', 'NOUN', 'PUNCT']
+```
+
+This indicates that the word 'je' is a pronoun, 'veux' is a verb, 'un' is a determiner, and so on.
+
+---
+
+# Run test on morphological traits
+
+Running for morphological traits is the same as for pos-tagging, except that you need to set the ['experiment_path'](command:_github.copilot.openSymbolInFile?%5B%22launch_inference.py%22%2C%22experiment_path%22%5D "launch_inference.py") variable to the path of the experiment you want to run inference on. For example, you might set it to ['logs/separate'](command:_github.copilot.openRelativePath?%5B%22logs%2Fget_morphy_French%22%5D "logs/get_morphy_French") or ['logs/fusion'](command:_github.copilot.openRelativePath?%5B%22logs%2Fget_morphy_French%22%5D "logs/separate") or ['logs/supertag'](command:_github.copilot.openRelativePath?%5B%22logs%2Fget_morphy_French%22%5D "logs/fusion").
+
+The output will look something like this:
+
+```sh
+WORD: je
+OUTPUT: ['Not', 'Not', 'No', 'Neut', 'Sing', '1', 'Emp', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Sup', 'Not', 'Not', 'Not', 'Digit', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not']
+WORD: veux
+OUTPUT: ['Not', 'Not', 'Not', 'Not', 'Sing', '3', 'Tot', 'Not', 'Not', 'Fut', 'Fin', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Vrnc', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not']
+WORD: un
+OUTPUT: ['Not', 'Not', 'Not', 'Neut', 'Sing', 'Not', 'Emp', 'Not', 'Not', 'Not', 'Not', 'Mult', 'Not', 'Not', 'Not', 'Not', 'Not', 'Sup', 'Arch', 'Not', 'Not', 'Digit', 'Not', 'Not', 'Not', 'Not', 'Ind', 'Not']
+...
+```
+
+
+
+
+
