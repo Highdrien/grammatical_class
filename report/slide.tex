@@ -35,7 +35,7 @@
     \end{figure}
 \end{frame}
 
-\begin{frame}{Les Données: Le dataset}
+\begin{frame}{Le dataset}
     Nous avons utilisé le dataset Universal Dependencies 2.13.
 
     Le dataset en français contient:
@@ -52,15 +52,15 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Les \textit{morphy}}
     \begin{figure}
         \centering
         \includegraphics[width=0.8\textwidth]{all_morphy.png}
-        \caption{Ensemble de tous les \textit{morphy}}
+        % \caption{Ensemble de tous les \textit{morphy}}
     \end{figure}
 \end{frame}
 
-\begin{frame}{Les Données: création de séquences}
+\begin{frame}{création de séquences}
     \begin{exampleblock}{Idée}
         On rajoute des caractères $\langle$PAD$\rangle$ pour compléter les phrases,
         on rajoute aussi un label qui correcponds au pad.
@@ -84,7 +84,7 @@
     \end{table}
 \end{frame}
 
-\begin{frame}{Les Données: La gestion des mots inconnus}
+\begin{frame}{La gestion des mots inconnus}
     \begin{exampleblock}{Idée}
         Si le modèle rencontre un mot inconnus, il va le remplacer par le mot $\langle$UNK$\rangle$.
         Le modèle doit alors aussi apprendre ce mot lors de l'entraînement.
@@ -97,7 +97,7 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Les Données: Encodage des labels}
+\begin{frame}{Encodage des labels}
     Pour les \textit{pos} :
     \begin{itemize}
         \item On remplace le label par son indice dans la liste des labels.
@@ -110,11 +110,13 @@
 
     [0, 0, 1, 0, 1, 2, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-    \begin{itemize}
-        \item Entrée: $x$ de taille $B \times K$ contenant les indices des mots
-        \item Sortie de \textit{pos}: $y_{pos}$ de taille $B \times K \times 19$
-        \item Sortie de \textit{morphy}: $y_{morphy}$ de taille $B \times K \times 28 \times 13$
-    \end{itemize}
+    \begin{exampleblock}{Shape}
+        \begin{itemize}
+            \item Entrée: $x$ de taille $B \times K$ contenant les indices des mots
+            \item Sortie de \textit{pos}: $y_{pos}$ de taille $B \times K \times 19$
+            \item Sortie de \textit{morphy}: $y_{morphy}$ de taille $B \times K \times 28 \times 13$
+        \end{itemize}
+    \end{exampleblock}
 \end{frame}
 
 \begin{frame}{Modèle \textit{GET\_POS}}
@@ -275,16 +277,31 @@
     \end{table}
 \end{frame}
 
-\begin{frame}
+\begin{frame}{Inférences}
     
 \end{frame}
 
-\begin{frame}
-    
+\begin{frame}{Nos difficultés rencontrés}
+    \begin{itemize}
+        \item Trover la bonne loss pour les \textit{morphy}. Car avant on avait seulement 
+            la crossentropy et 0.02\% d'accuracy.
+        \item Dans le modèle \textit{SEPARATE}, on a l'ensemble des dernières couches 
+            Dense dans une liste. Et donc le \textit{model.parameters()} ne donnent pas les 
+            parameters de ces couches.
+        \item Avant on n'avait pas ajouté les $-\infty$ dans le modèle \textit{SEPARATE},
+            donc on avait de moins bonnes performances
+    \end{itemize}
 \end{frame}
 
-\begin{frame}
-    
+\begin{frame}{Les pistes d'améliorations}
+    \begin{itemize}
+        \item Changer la façon dont on crée les séquences.
+        \item Ne pas prendre en comte les $\langle$PAD$\rangle$ dans la loss et les métriques.
+        \item Changer la façon de mettre des mots inconnus. Car là, les mots inconnus 
+            ne change pas sur les epochs.
+        \item comparer les résultats en fonction de la taille des séquences
+        \item Remplacer les modules LSTM par des Transformers.
+    \end{itemize}
 \end{frame}
 
 

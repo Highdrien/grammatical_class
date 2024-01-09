@@ -60,8 +60,7 @@ def get_model(config: EasyDict) -> torch.nn.Module:
                                             add_zero=morphy_config.add_zero)
                 
             else: #si on veut utiliser pos pour morphy
-                #TODO: mettre le bon chemin qui mène au fichier de config de pos
-                pos_path = 'logs/get_pos_French'
+                pos_path = 'logs/get_pos'
                 print(f'use model pos: {pos_path}')
                 model = MorphPosLSTMClassifier(num_words=config.data.vocab.num_words,
                                                embedding_size=morphy_config.embedding_size,
