@@ -192,6 +192,15 @@ Pour la prédiction de \textit{morphy}, nous avons aussi utilisé l'accuracy mic
 métrique qu'on a appelée \textit{all good}, qui fait la moyenne des mots dont la prédiction de tous les \textit{morphy}
 sont juste. Si la métrique vaut $0.2$, cela veut dire qu'il y a 1 mot sur 5, qui dont la prédiction est totalement bonne.
 
+\section{Baseline}
+
+Nous avons implementée une baseline afin d'effectuer des comparaisons de performances avec nos modèles. \\
+
+La baseline s'appuie sur un modèle simple où un dictionnaire est créé et parcourt l'ensemble des données d'entraînements afin de récolter tous les mots qu'il n'a jamais croisé et leur label. Ainsi, le dictionnaire indique le vocabulaire du texte en lui assignant le premier label croisé lors du parcours du dataset d'entraînement. \\
+
+Cette baseline s'appuie sur une logique "naïve" en quelque sorte, et utilise les mêmes métriques que nos modèles. \\
+
+Notre baseline témoigne d'une performance relativement élevée, qui sera mise en contraste avec les performances des autres modèles décrits précédemment. 
 
 \section{Résultats}
 
@@ -220,8 +229,7 @@ correctement cette tâche d'étiquetage, comme le montre la figure suivante :
 Les courbes de loss et d'accuracy décrivent un apprentissage efficient dès la 5e epoch. À partir de la 5e epoch, l'apprentissage
 stagne et si on s'étend à plus de 20 epochs, on risque de faire du overfitting, car l'écart entre les performances de l'entraînement
 et les performances de la validation commence à se creuser. 
-L'accuracy micro est relativement meilleure que l'accuracy macro, ce qui signifie que les performances de toutes les classes confondues sont
-meilleures que si on cherche à quantifier les performances globales à partir de chaque classe séparément, traitée de manière égale. D'autre part les performances d'accuracy macro sont moins stables que celle de l'accuracy micro. 
+L'accuracy micro est relativement meilleure que l'accuracy macro. D'autre part les performances d'accuracy macro sont moins stables que celle de l'accuracy micro. 
 
 On constate que la valeur de l'accuracy de validation est un peu plus faible que celle d'entraînement, cela 
 s'explique par plusieurs facteurs, notamment la difficulté du modèle à généraliser aux nouveaux mots inconnus.
@@ -239,6 +247,8 @@ s'explique par plusieurs facteurs, notamment la difficulté du modèle à géné
     \caption{Résultats du modèle \textit{GET\_POS} sur la base de données de teste.}
     \label{tab:test getpos}
 \end{table}
+
+Les résultats du tableau\ref{tab:test getpos} témoignent d'une performance satisfaisante du modèle POS avec une accuracy micro de 94,4\%. Néanmoins, si on souhaite d'intéresser à l'accuracy micro, nous atteignons une accuracy de 81,6\%.
 
 \subsection{Résultats la prédiction des \textit{morphy}}
 
@@ -267,9 +277,8 @@ D'autre part, si on considère les performances selon l'accuracy micro, il n'y a
 se creuse au fil des epochs entre les deux courbes, donc il n'y a pas de overfitting selon cette métrique. On peut expliquer la meilleure performance
 de la validation par rapport à l'entraînement par l'utilisation du dropout dans l'apprentissage. Cette méthode est présente lors
 de l'entraînement, ce qui va naturellement baisser ses performances. 
-Néanmoins, l'accuracy micro est plus stable que celle de l'accuracy \textit{allgood} lorsqu'on considère les classes séparément dans le
-calcul de l'accuracy, où l'écart entre validation et entraînement se creuse au fil des epochs. L'amélioration des performances
-n'est donc pas égale au fil des dernières epochs entre les différentes classes. Le modèle a donc tendance à overfitter si on considère l'accuracy \textit{allgood}. 
+Néanmoins, l'accuracy micro est plus stable que celle de l'accuracy \textit{allgood}, où l'écart entre validation et entraînement se creuse au fil des epochs. L'amélioration des performances
+n'est donc pas égale au fil des dernières epochs entre les différentes classes. Le modèle a donc tendance à surapprendre si on considère l'accuracy \textit{allgood}. 
 
 
 \begin{figure}[H]
@@ -291,8 +300,8 @@ n'est donc pas égale au fil des dernières epochs entre les différentes classe
     \label{fig: results separate}
 \end{figure}
 
-La modèle \textit{SEPARATE} témoigne d'une bonne performance selon l'accurcy micro, où les performances de l'entraînement et de la validation corrèlent tout du long. Cet apprentissage est également exponentielle d'après l'allule de la loss et de l'accuracy micro. Néanmoins, l'écart entre performances d'entraînement et de validation au niveau de la loss se creuse au fil des epochs, ce qui signifie qu'il risque d'y avoir du surapprentissage. Cependant, l'accuracy \textit{allgood} reste presque "linéaire" avec un écart entre
-validation et entraînement qui se creuse au fil des epochs tout en étant de plus en plus instable. Le modèle ne traduit de performances stables et corrèctes si l'on considère la loss et l'accuracy micro, pas selon l'accuracy \textit{allgood}.
+La modèle \textit{SEPARATE} témoigne d'une bonne performance selon l'accurcy micro, où les performances de l'entraînement et de la validation corrèlent tout du long. Cet apprentissage est également exponentielle d'après l'allure de la loss et de l'accuracy micro. Néanmoins, l'écart entre performances d'entraînement et de validation au niveau de la loss se creuse au fil des epochs, ce qui signifie qu'il risque d'y avoir du surapprentissage. Cependant, l'accuracy \textit{allgood} reste presque "linéaire" avec un écart entre
+validation et entraînement qui se creuse au fil des epochs tout en étant de plus en plus instable. Le modèle ne traduit de performances stables et correctes si l'on ne considère que la loss et l'accuracy micro, en mettant de côté les performances selon l'accuracy \textit{allgood}.
 
 \begin{figure}[H]
     \centering
@@ -334,6 +343,12 @@ Le modèle \textit{FUSION} témoigne d'un apprentissage similaire au modèle pr�
     \caption{Résultats de test sur la prédiction des \textit{morphy}}
     \label{tab: test morphy}
 \end{table}
+
+Les résultats du tableau\ref{tab: test morphy} mettent en comparaison les résultats de performances entre les modèles de \textit{BASELINE}, \textit{SUPERTAG}, \textit{SEPARATE} et \textit{FUSION}. Le modèle baseline indique une performance d'accuracy de 98\% 
+
+Entre les trois autres modèles, c'est le modèle \textit{SEPARATE} qui performe le mieux en terme d'accuracy micro, cependant, c'est le modèle \textit{FUSION} qui performe le mieux en terme d'accuracy allgood. Il y a une amélioration de l'accuracy allgood d'un facteur 3 par rapport au modèle \textit{SEPARATE} avec seulement une baisse d'à peine 1\% d'accuracy micro. Cette relative meilleure performance du modèle \textit{FUSION} est notamment confirmée avec l'analyse des performances graphiques du modèle. 
+
+Néanmoins, ces modèles ne permettent pas de dépasser les performances de la baseline, alors que les modèles implémentés ont une significative complexité plus importante que celle de la baseline. Ce qui se peut s'expliquer que la baseline s'est appuyée sur un dataset trop petit et des données biaisées, où la coïncidence a sûrement dû jouer. 
 
 \section{Inférences}
 
