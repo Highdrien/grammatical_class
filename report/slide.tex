@@ -52,16 +52,69 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Les Données: Le padding}
+\begin{frame}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.8\textwidth]{all_morphy.png}
+        \caption{Ensemble de tous les \textit{morphy}}
+    \end{figure}
+\end{frame}
 
+\begin{frame}{Les Données: création de séquences}
+    \begin{exampleblock}{Idée}
+        On rajoute des caractères $\langle$PAD$\rangle$ pour compléter les phrases,
+        on rajoute aussi un label qui correcponds au pad.
+    \end{exampleblock}
+
+    \bigskip
+    Si on fixe une longueur de séquence à 5, on va transfomé la phrase:
+    \begin{table}
+        \centering
+        \begin{tabular}{|c|c|c|}
+            \hline
+            \textbf{type} & \textbf{exemple} & \textbf{longueur} \\
+            \hline
+            phrase & Les poissons sont des animaux vertébrés . & 7 \\
+            \hline
+            sequence & Les poissons sont des animaux & 5\\
+             & vertébrés . $\langle$PAD$\rangle$ $\langle$PAD$\rangle$ $\langle$PAD$\rangle$ & 5\\
+            \hline
+        \end{tabular}
+        \caption{Exemple de la création du séquences}
+    \end{table}
 \end{frame}
 
 \begin{frame}{Les Données: La gestion des mots inconnus}
+    \begin{exampleblock}{Idée}
+        Si le modèle rencontre un mot inconnus, il va le remplacer par le mot $\langle$UNK$\rangle$.
+        Le modèle doit alors aussi apprendre ce mot lors de l'entraînement.
+    \end{exampleblock}
 
+    \begin{itemize}
+        \item Avant l'entraînement, on fait un dropout des mots avec un taux d'oublie de $1\%$.
+        \item On obtient un nombre de mots dans le vocabulaire de taille 67814 (contre 76048 dans le dataset).
+        \item On a fixé la seed avant
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{Les Données: Encodage des labels}
+    Pour les \textit{pos} :
+    \begin{itemize}
+        \item On remplace le label par son indice dans la liste des labels.
+    \end{itemize}
+    Pour les \textit{morphy} :
+    \begin{itemize}
+        \item On remplace le label par une liste d'indice, où l'éléments $i$ de la liste corresponds à l'incide du $i$-ème type de morphy.
+    \end{itemize}
+    Exemple: \textit{Emph=No$\mid$Number=Sing$\mid$Person=1$\mid$PronType=Prs}
 
+    [0, 0, 1, 0, 1, 2, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+    \begin{itemize}
+        \item Entrée: $x$ de taille $B \times K$ contenant les indices des mots
+        \item Sortie de \textit{pos}: $y_{pos}$ de taille $B \times K \times 19$
+        \item Sortie de \textit{morphy}: $y_{morphy}$ de taille $B \times K \times 28 \times 13$
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{Modèle \textit{GET\_POS}}
