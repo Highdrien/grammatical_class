@@ -1,15 +1,15 @@
 import os
 import yaml
 import argparse
-from easydict import EasyDict
 from icecream import ic
 from typing import Optional
+from easydict import EasyDict
 
 from src.train import train
 from src.test import test
 from src.infer import infer
-from src.baseline.baseline_benchmark import test_dictionary
 from config.process_config import process_config
+from src.baseline import baseline_benchmark, baseline_infer
 
 
 def load_config(path: Optional[str]='config/config.yaml') -> EasyDict:
@@ -46,7 +46,7 @@ def main(options: dict) -> None:
         train(config)
     
     if options['mode'] == 'baseline':
-        test_dictionary()
+        baseline_benchmark.test_dictionary()
     
     if options['mode'] == 'test':
         assert options['path'] is not None, 'Error, please enter the path of your experimentation that you want to test'
@@ -56,10 +56,12 @@ def main(options: dict) -> None:
     
     if options['mode'] == 'infer':
         assert options['path'] is not None, 'Error, please enter the path of your experimentation that you want to test'
-        config_path = find_config(experiment_path=options['path'])
-        config = load_config(config_path)
-        # ic(config)
-        infer(config=config, logging_path=options['path'], folder='infer')
+        if options['path'] == 'baseline':
+            baseline_infer.run_infer()
+        else:
+            config_path = find_config(experiment_path=options['path'])
+            config = load_config(config_path)
+            infer(config=config, logging_path=options['path'], folder='infer')
 
 
 if __name__ == "__main__":
