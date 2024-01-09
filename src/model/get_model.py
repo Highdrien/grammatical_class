@@ -7,7 +7,6 @@ from typing import Optional
 from src.model.LSTM import LSTMClassifier
 from src.model.separate_LSTM import MorphLSTMClassifier
 from src.model.LSTM_pos_and_morpy import MorphPosLSTMClassifier
-# from src.model.BERT import BertClassifier
 
 NUN_C_POSSIBILITY = [2, 2, 3, 5, 3, 4, 13, 2, 13, 5, 5, 5, 5, 2, 4, 2, 3, 4, 6, 3, 4, 5, 2, 3, 2, 2, 3, 4]
 
