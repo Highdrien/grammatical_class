@@ -60,7 +60,7 @@
     \end{figure}
 \end{frame}
 
-\begin{frame}{création de séquences}
+\begin{frame}{Création de séquences}
     \begin{exampleblock}{Idée}
         On rajoute des caractères $\langle$PAD$\rangle$ pour compléter les phrases,
         on rajoute aussi un label qui correspond au pad.
@@ -86,14 +86,14 @@
 
 \begin{frame}{La gestion des mots inconnus}
     \begin{exampleblock}{Idée}
-        Si le modèle rencontre un mot inconnus, il va le remplacer par le mot $\langle$UNK$\rangle$.
+        Si le modèle rencontre un mot inconnu, il va le remplacer par le mot $\langle$UNK$\rangle$.
         Le modèle doit alors aussi apprendre ce mot lors de l'entraînement.
     \end{exampleblock}
 
     \begin{itemize}
-        \item Avant l'entraînement, on fait un dropout des mots avec un taux d'oublie de $1\%$.
+        \item Avant l'entraînement, on fait un dropout des mots avec un taux d'oubli de $1\%$.
         \item On obtient un nombre de mots dans le vocabulaire de taille 67814 (contre 76048 dans le dataset).
-        \item On a fixé la seed avant
+        \item On a fixé le seed avant
     \end{itemize}
 \end{frame}
 
@@ -326,12 +326,12 @@
 
 \begin{frame}{Nos difficultés rencontrées}
     \begin{itemize}
-        \item Trouver la bonne loss pour les \textit{morphy}. Car avant, on avait seulement 
+        \item Trouver la bonne loss pour les \textit{morphy}, car avant, on avait seulement 
             la crossentropy et 0.02\% d'accuracy.
         \item Dans le modèle \textit{SEPARATE}, on a l'ensemble des dernières couches 
-            Dense dans une liste. Et donc le \textit{model.parameters()} ne donnent pas les 
+            Dense dans une liste, et donc le \textit{model.parameters()} ne donne pas les 
             paramètres de ces couches.
-        \item Avant, on n'avait pas ajouté les $-\infty$ dans le modèle \textit{SEPARATE},
+        \item On n'avait pas ajouté les $-\infty$ dans le modèle \textit{SEPARATE},
             donc on avait de moins bonnes performances
     \end{itemize}
 \end{frame}
@@ -342,7 +342,7 @@
         \item Ne pas prendre en comte les $\langle$PAD$\rangle$ dans la loss et les métriques.
         \item Changer la façon de mettre des mots inconnus. Car là, les mots inconnus 
             ne changent pas sur les epochs.
-        \item comparer les résultats en fonction de la taille des séquences
+        \item Comparer les résultats en fonction de la taille des séquences
         \item Mettre une couche Dense après les couches separate.
         \item Remplacer les modules LSTM par des Transformers.
     \end{itemize}
