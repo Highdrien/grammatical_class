@@ -7,7 +7,6 @@ from typing import Optional
 from src.model.LSTM import LSTMClassifier
 from src.model.separate_LSTM import MorphLSTMClassifier
 from src.model.LSTM_pos_and_morpy import MorphPosLSTMClassifier
-# from src.model.BERT import BertClassifier
 
 NUN_C_POSSIBILITY = [2, 2, 3, 5, 3, 4, 13, 2, 13, 5, 5, 5, 5, 2, 4, 2, 3, 4, 6, 3, 4, 5, 2, 3, 2, 2, 3, 4]
 
@@ -60,8 +59,7 @@ def get_model(config: EasyDict) -> torch.nn.Module:
                                             add_zero=morphy_config.add_zero)
                 
             else: #si on veut utiliser pos pour morphy
-                #TODO: mettre le bon chemin qui mène au fichier de config de pos
-                pos_path = 'logs/get_pos_French'
+                pos_path = 'logs/get_pos'
                 print(f'use model pos: {pos_path}')
                 model = MorphPosLSTMClassifier(num_words=config.data.vocab.num_words,
                                                embedding_size=morphy_config.embedding_size,

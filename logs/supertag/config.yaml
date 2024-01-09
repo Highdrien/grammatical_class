@@ -1,5 +1,5 @@
 config_metadata: 'Saving time : 01/06/2024, 00:33:48'
-name: 'get_morphy_French'
+name: supertag
 save_experiment: true
 
 # data options
