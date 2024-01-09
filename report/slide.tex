@@ -48,7 +48,7 @@
     On a recensé:
     \begin{itemize}
         \item 19 classes \textit{pos}.
-        \item 28 classes \textit{morphy}, dont le nombre maximun de possibilités est 13.
+        \item 28 classes \textit{morphy}, avec un nombre de possibilités entre 2 et 13
     \end{itemize}
 \end{frame}
 
@@ -94,10 +94,144 @@
 \begin{frame}{Modèle \textit{FUSION}}
     \begin{figure}[!ht]
         \centering
-        \includegraphics[width=\textwidth]{get_morphy_fusion.png}
+        \includegraphics[width=0.9\textwidth]{get_morphy_fusion.png}
         \caption{Modèle \textit{FUSION}}
         \label{fig: model fusion}
     \end{figure}
+\end{frame}
+
+\begin{frame}{Loss et Métriques}
+    Les loss:
+    \begin{itemize}
+        \item crossentropy pour le \textit{pos}
+        \item moyenne de la crossentropy sur les 28 classes pour le \textit{morphy}
+    \end{itemize}
+    Les métriques:
+    \begin{itemize}
+        \item accuracy micro
+        \item accuracy macro (pour le \textit{pos})
+        \item allgood (pour le \textit{morphy})
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Résultats: \textit{GET\_POS} }
+    \begin{figure}
+        \centering
+        \begin{subfigure}{0.32\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{../logs/get_pos_French/crossentropy.png}
+        \end{subfigure}
+        \begin{subfigure}{0.32\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{../logs/get_pos_French/acc micro.png}
+        \end{subfigure}
+        \begin{subfigure}{0.32\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{../logs/get_pos_French/acc macro.png}
+        \end{subfigure}
+        \caption{Entraînement du modèle \textit{GET\_POS}.}
+    \end{figure}
+
+    \begin{table}
+        \centering
+        \begin{tabular}{|c|c|c|c|}
+            \hline
+            Nom du modèle & crossentropy & accuracy micro & accuracy macro \\
+            \hline
+            \textit{GET\_POS} & 0.204 & 0.944 & 0.816\\
+            \hline
+        \end{tabular}
+        \caption{Résultats du modèle \textit{GET\_POS} sur la base de données de teste.}
+        \label{tab:test getpos}
+    \end{table}
+\end{frame}
+
+\begin{frame}{Résultats des modèles \textit{SUPERTAG} et \textit{SEPARATE}}
+    \begin{figure}
+        \centering
+        \begin{subfigure}{0.32\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{../logs/supertag/crossentropy.png}
+        \end{subfigure}
+        \begin{subfigure}{0.32\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{../logs/supertag/acc micro.png}
+        \end{subfigure}
+        \begin{subfigure}{0.32\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{../logs/supertag/allgood.png}
+        \end{subfigure}
+        \caption{Entraînement du modèle \textit{SUPERTAG}.}
+        \label{fig: results supertag}
+    \end{figure}
+    \begin{figure}
+        \centering
+        \begin{subfigure}{0.32\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{../logs/separate/crossentropy.png}
+        \end{subfigure}
+        \begin{subfigure}{0.32\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{../logs/separate/acc micro.png}
+        \end{subfigure}
+        \begin{subfigure}{0.32\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{../logs/separate/allgood.png}
+        \end{subfigure}
+        \caption{Entraînement du modèle \textit{SEPARATE}.}
+        \label{fig: results separate}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Résultats du modèle \textit{FUSION} et résultats de teste}
+    \begin{figure}
+        \centering
+        \begin{subfigure}{0.32\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{../logs/fusion/crossentropy.png}
+        \end{subfigure}
+        \begin{subfigure}{0.32\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{../logs/fusion/acc micro.png}
+        \end{subfigure}
+        \begin{subfigure}{0.32\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{../logs/fusion/allgood.png}
+        \end{subfigure}
+        \caption{Entraînement du modèle \textit{FUSION}.}
+        \label{fig: results fusion}
+    \end{figure}
+
+    \begin{table}
+        \centering
+        \begin{tabular}{|c|c|c|c|}
+            \hline
+             Nom du modèle & crossentropy & accuracy micro & all good\\
+             \hline
+             \textit{BASELINE}& - & 0.980 & 0.791 \\
+             \hline
+             \textit{SUPERTAG}& 1.700 & 0.436 & 0.002\\
+             \hline
+             \textit{SEPARATE}& 1.70 & 0.893 & 0.046\\
+             \hline
+             \textit{FUSION}& 1.698 & 0.884 & 0.154 \\
+             \hline
+        \end{tabular}
+        \caption{Résultats de test sur la prédiction des \textit{morphy}}
+        \label{tab: test morphy}
+    \end{table}
+\end{frame}
+
+\begin{frame}
+    
+\end{frame}
+
+\begin{frame}
+    
+\end{frame}
+
+\begin{frame}
+    
 \end{frame}
 
 
