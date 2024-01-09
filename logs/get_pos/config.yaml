@@ -1,5 +1,5 @@
 config_metadata: 'Saving time : 01/07/2024, 10:38:06'
-name: 'get_pos_French'
+name: 'get_pos'
 save_experiment: true
 
 # data options
