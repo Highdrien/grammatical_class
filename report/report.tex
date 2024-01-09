@@ -140,8 +140,8 @@ Le modèle commence par une couche d'embedding pour deux couches de LSTM bidirec
 dans 3 couches denses cachées dont la dernière contient $364$ neurones
 \footnote{Nous avons pris $364$ neurones car $364 = 28 \times 13$.}
 Avant que nos données sortent du modèle, elles ont une
-taille de $B \times B \times 364$. On \textit{reshape} alors les données pour avoir une sortie de taille 
-$B \times B \times 28 \times 13$. La Figure~\ref{fig: model supertag} représente ce modèle.
+taille de $B \times K \times 364$. On \textit{reshape} alors les données pour avoir une sortie de taille 
+$B \times K \times 28 \times 13$. La Figure~\ref{fig: model supertag} représente ce modèle.
 
 \begin{figure}[H]
     \centering
@@ -160,7 +160,7 @@ pour obtenir un vecteur de taille $13$ pour tous les mots
 lorsque l'on faisait cela, on avait une loss avec une valeur de \textit{not a number}, donc on a décidé de mettre $-1000$ à 
 la place.}.
 On va ensuite concaténer tous les résultats avec une sortie de 
-taille $B \times B \times 28 \times 13$. La Figure~\ref{fig: model separate} représente ce modèle.
+taille $B \times K \times 28 \times 13$. La Figure~\ref{fig: model separate} représente ce modèle.
 
 \begin{figure}[H]
     \centering
