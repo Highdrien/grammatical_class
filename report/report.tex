@@ -220,8 +220,8 @@ correctement cette tâche d'étiquetage, comme le montre la figure suivante :
 Les courbes de loss et d'accuracy décrivent un apprentissage efficient dès la 5e epoch. À partir de la 5e epoch, l'apprentissage
 stagne et si on s'étend à plus de 20 epochs, on risque de faire du overfitting, car l'écart entre les performances de l'entraînement
 et les performances de la validation commence à se creuser. 
-L'accuracy micro est meilleure que l'accuracy macro, ce qui signifie que si les performances de toutes les classes confondues sont
-meilleures que si on cherche à quantifier les performances globales à partir de chaque classe séparément, traitée de manière égale.
+L'accuracy micro est relativement meilleure que l'accuracy macro, ce qui signifie que les performances de toutes les classes confondues sont
+meilleures que si on cherche à quantifier les performances globales à partir de chaque classe séparément, traitée de manière égale. D'autre part les performances d'accuracy macro sont moins stables que celle de l'accuracy micro. 
 
 On constate que la valeur de l'accuracy de validation est un peu plus faible que celle d'entraînement, cela 
 s'explique par plusieurs facteurs, notamment la difficulté du modèle à généraliser aux nouveaux mots inconnus.
@@ -263,13 +263,13 @@ s'explique par plusieurs facteurs, notamment la difficulté du modèle à géné
 
 Les courbes de loss témoignent d'un entraînement efficient. Cependant, les courbes d'accuracy montrent que les performances ne
 s'améliorent pas de la même manière que la loss. Les courbes témoignent même d'une amélioration linéaire plutôt qu'exponentielle.
-D'autre part, la tendance des performances d'accuracy entre validation et entraînement reste la même, et il n'y a pas d'écart qui
-se creuse au fil des epochs entre les deux courbes, donc il n'y a pas de overfitting. On peut expliquer la meilleure performance
+D'autre part, si on considère les performances selon l'accuracy micro, il n'y a pas d'écart qui
+se creuse au fil des epochs entre les deux courbes, donc il n'y a pas de overfitting selon cette métrique. On peut expliquer la meilleure performance
 de la validation par rapport à l'entraînement par l'utilisation du dropout dans l'apprentissage. Cette méthode est présente lors
 de l'entraînement, ce qui va naturellement baisser ses performances. 
-Néanmoins, l'accuracy micro est plus stable que l'accuracy \textit{allgood} lorsqu'on considère les classes séparément dans le
-calcul de l'accuracy, où l'écart entre validation et entraînement se creuse aux dernières epochs. L'amélioration des performances
-n'est donc pas égale au fil des dernières epochs entre les différentes classes.
+Néanmoins, l'accuracy micro est plus stable que celle de l'accuracy \textit{allgood} lorsqu'on considère les classes séparément dans le
+calcul de l'accuracy, où l'écart entre validation et entraînement se creuse au fil des epochs. L'amélioration des performances
+n'est donc pas égale au fil des dernières epochs entre les différentes classes. Le modèle a donc tendance à overfitter si on considère l'accuracy \textit{allgood}. 
 
 
 \begin{figure}[H]
@@ -291,11 +291,8 @@ n'est donc pas égale au fil des dernières epochs entre les différentes classe
     \label{fig: results separate}
 \end{figure}
 
-La modèle \textit{SEPARATE} permet de corréler les performances traduites par la loss et par l'accuracy micro. En effet, on retrouve
-les caractéristiques entre validation et entraînement dans l'accuracy micro décrite précédemment, mais cette fois la tendance des
-courbes est exponentielle. Ainsi, l'apprentissage selon la performance d'accuracy générée par agrégation de toutes les classes est
-tout aussi efficace que celle traduite par la loss. Cependant, l'accuracy \textit{allgood} reste "linéaire" avec un écart entre
-validation et entraînement qui se creuse au fil des epochs.  
+La modèle \textit{SEPARATE} témoigne d'une bonne performance selon l'accurcy micro, où les performances de l'entraînement et de la validation corrèlent tout du long. Cet apprentissage est également exponentielle d'après l'allule de la loss et de l'accuracy micro. Néanmoins, l'écart entre performances d'entraînement et de validation au niveau de la loss se creuse au fil des epochs, ce qui signifie qu'il risque d'y avoir du surapprentissage. Cependant, l'accuracy \textit{allgood} reste presque "linéaire" avec un écart entre
+validation et entraînement qui se creuse au fil des epochs tout en étant de plus en plus instable. Le modèle ne traduit de performances stables et corrèctes si l'on considère la loss et l'accuracy micro, pas selon l'accuracy \textit{allgood}.
 
 \begin{figure}[H]
     \centering
@@ -316,8 +313,7 @@ validation et entraînement qui se creuse au fil des epochs.
     \label{fig: results fusion}
 \end{figure}
 
-Le modèle \textit{FUSION} témoigne d'un apprentissage instable, qui se traduit notamment lors de l'étape de validation. En effet,
-ce phénomène est souligné notamment avec la légère augmentation de la loss de validation qui appuie l'instabilité de la validation. 
+Le modèle \textit{FUSION} témoigne d'un apprentissage similaire au modèle précédent \textit{SEPARATE}. Cependant, les performances considérées selon l'accuracy \textit{allgood} adoptent une tendance relativement plus exponentielle, ce qui permet de mieux le corréler avec les performances de la loss et de l'accuracy micro. D'autre part, on retrouve le phénomène de performances de validation meilleures que celles de l'entraînement pour l'accuracy \textit{allgood}, avec relativement moins d'instabilité que le modèle précédent, mais l'instabilité subsiste. Ce modèle \textit{FUSION} témoigne d'une amélioration vis-à-vis du modèle \textit{SEPARATE}.
 
 
 \begin{table}[H]
@@ -339,10 +335,21 @@ ce phénomène est souligné notamment avec la légère augmentation de la loss 
     \label{tab: test morphy}
 \end{table}
 
-
 \section{Inférences}
 
 \newpage
+
+\section{Conclusion}
+
+Nous avons exploré deux tâches principales : l'étiquetage des parties du discours (\textit{pos}) et la prédiction des traits morphologiques (\textit{morphy}). 
+
+Le modèle \textit{GET\_POS} a démontré des performances impressionnantes dans la prédiction des parties du discours, avec une accuracy micro de 94.4\% et une accuracy macro de 81.6\% sur le jeu de test. Ces résultats témoignent de la capacité du modèle à apprendre efficacement la structure grammaticale des phrases en français.
+
+Pour la tâche de prédiction des traits morphologiques, trois architectures de modèles ont été développées : \textit{SUPERTAG}, \textit{SEPARATE}, et \textit{FUSION}. Chacun de ces modèles a présenté des performances variées. Le modèle \textit{SEPARATE} a obtenu une accuracy micro de 89.3\% et une métrique \textit{all good} de 4.6\%, montrant sa capacité à prédire les traits morphologiques pour chaque classe. Cependant, le modèle \textit{FUSION} a montré une instabilité lors de l'entraînement, ce qui peut nécessiter des ajustements pour améliorer ses performances.
+
+Les résultats obtenus ouvrent des perspectives intéressantes pour l'amélioration des modèles de langage, en particulier dans le contexte du français. Des ajustements futurs pourraient inclure des stratégies plus sophistiquées pour la gestion des mots inconnus et des expériences avec d'autres architectures de modèles.
+
+Ce projet a donc permis d'explorer différentes facettes de la modélisation du langage, de la prédiction des parties du discours à la prédiction des traits morphologiques. Les résultats obtenus constituent une base solide pour des développements futurs dans le domaine de la compréhension automatique du langage naturel en français.
 
 \section{Annexes}
 \label{sec: Annexes}
