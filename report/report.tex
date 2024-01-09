@@ -80,7 +80,7 @@ de $K$ mots, et de rajouter si besoin des tokens <PAD> pour terminer la dernièr
 
 Nous avons, avant l'entraînement du modèle, appris un vocabulaire de mots qui fait la correspondance entre les mots et un nombre unique.
 Le vocabulaire a été fait seulement sur les mots qui sont dans la base de données d'entraînement. C'est donc pour cela qu'il peut
-arriver que des mots de la base de données de validation ou de test ne soient pas reconnue par le vocabulaire et donc par le modèle.
+arriver que des mots de la base de données de validation ou de test ne soient pas reconnus par le vocabulaire et donc par le modèle.
 Pour gérer ces mots inconnus, nous avons décidé de leur attribuer le token particulier : <UNK>. Pour que le modèle
 apprenne l'embedding de ce mot, il faut alors rajouter artificiellement des mots inconnus dans le corpus d'entraînement. Nous avons
 donc remplacé chaque mot de ce corpus par <UNK> avec une probabilité de $1\%$.
@@ -120,7 +120,7 @@ Nous avons donc en entrée une matrice de taille $B \times K$, contenant l'indic
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{get_pos.png}
+    \includegraphics[width=0.6\textwidth]{get_pos.png}
     \caption{Modèle \textit{GET\_POS}}
     \label{fig: model getpos}
 \end{figure} 
@@ -128,8 +128,8 @@ Nous avons donc en entrée une matrice de taille $B \times K$, contenant l'indic
 \subsection{Architecture des \textit{morphy}}
 
 Pour la tâche de prédiction des traits morphologiques, la difficulté est supérieure. En effet, pour cette tâche 
-il faut prédire pour chaque mot de la phrase à la fois son rôle dans la phrase (Verbe, Nom, etc.) mais aussi 
-pour chacune de ses classes prédire des attributs (singulier, pluriel, etc.). Nous avons donc créé plusieurs 
+il faut prédire pour chaque mot de la phrase à la fois son rôle dans la phrase (Verbe, Nom, etc.) mais aussi, 
+pour chacune de ses classes, prédire des attributs (singulier, pluriel, etc.). Nous avons donc créé plusieurs 
 architectures différentes que nous allons présenter. Nous avons aussi dû modifier la fonction de coût par 
 la moyenne des crossentropy sur les 28 \textit{morphy} différents. Nous avons utilisé l'optimizer Adam~\cite{kingma2014adam},
 et avons ajouté un gradient decay, qui fait que le learning rate est divisé par deux lors des epochs 10 et 20.
@@ -156,7 +156,7 @@ On reprend le même début que le modèle \textit{SUPERTAG} et l'on change la de
 \textit{morphy} en même temps avec une seule couche dense, on va avoir 28 couches denses (une par \textit{morphy}). Chaque couche
 va alors prédire les probabilités liées à son \textit{morphy}. On va alors ajouter, à chaque prédiction des couches, des $- 1000$
 pour obtenir un vecteur de taille $13$ pour tous les mots
-\footnote{On a voulu mettre des $-\infty$ car cela permetait d'avoir une probabilité de $0$ après le softmax. Cependant, 
+\footnote{On a voulu mettre des $-\infty$ car cela permettait d'avoir une probabilité de $0$ après le softmax. Cependant, 
 lorsque l'on faisait cela, on avait une loss avec une valeur de \textit{not a number}, donc on a décidé de mettre $-1000$ à 
 la place.}.
 On va ensuite concaténer tous les résultats avec une sortie de 
@@ -172,7 +172,7 @@ taille $B \times B \times 28 \times 13$. La Figure~\ref{fig: model separate} rep
 \subsubsection{Modèle \textit{FUSION}}
 
 L'idée de ce modèle est d'utiliser la prédiction du modèle \textit{GET\_POS} pour aider le modèle \textit{SEPARATE}.
-On fait passer les données dans les 2 couches de LSTM, et en sortie on va concaténer la sortie du LSTM avec la sortie
+On fait passer les données dans les 2 couches de LSTM, et en sortie, on va concaténer la sortie du LSTM avec la sortie
 d'un modèle \textit{GET\_POS} pré-entraîné.
 La Figure~\ref{fig: model fusion} représente ce modèle.
 
@@ -198,17 +198,17 @@ sont justes. Si la métrique vaut $0.2$, cela veut dire qu'il y a 1 mot sur 5 do
 
 \subsection{La baseline}
 
-Nous avons implementé une \textit{BASELINE}, qui prédit les \textit{morphy}, afin d'effectuer des comparaisons de performances avec nos modèles.
+Nous avons implémenté une \textit{BASELINE}, qui prédit les \textit{morphy}, afin d'effectuer des comparaisons de performances avec nos modèles.
 Cette baseline s'appuie sur un modèle simple où un dictionnaire est créé et parcourt l'ensemble des données d'entraînements afin de 
-récolter tous les mots qu'il n'a jamais croisé et leur label. Ainsi, le dictionnaire indique le vocabulaire du texte en lui assignant
+récolter tous les mots qu'il n'a jamais croisés et leur label. Ainsi, le dictionnaire indique le vocabulaire du texte en lui assignant
 le premier label croisé lors du parcours du dataset d'entraînement.
 
 \section{Résultats}
 
 \subsection{Résultats pour la prédiction de \textit{pos}}
 Nous avons donc lancé un entraînement de notre réseau \textit{GET\_POS} sur 20 epochs et 
-nous avons obtenu une accuracy de validation d'environ 95\% ce qui dénote que le réseau a réussi à apprendre 
-correctement cette tâche d'étiquetage, comme le montre la figure suivante\ref{fig: train getpos} :
+nous avons obtenu une accuracy de validation d'environ $95\%$ ce qui dénote que le réseau a réussi à apprendre 
+correctement cette tâche d'étiquetage, comme le montre la Figure~\ref{fig: train getpos} :
 
 \begin{figure}[H]
     \centering
@@ -228,8 +228,8 @@ correctement cette tâche d'étiquetage, comme le montre la figure suivante\ref{
     \label{fig: train getpos}
 \end{figure}
 
-Nous avons un apprentissage satisfaisant du modèle comme en témoigne les Figures~\ref{fig: train getpos}. 
-L'accuracy micro est relativement meilleure en terme de performances et de stabilité que l'accuracy macro.
+Nous avons un apprentissage satisfaisant du modèle comme en témoignent les Figures~\ref{fig: train getpos}. 
+L'accuracy micro est relativement meilleure en termes de performances et de stabilité que l'accuracy macro.
 
 On constate que la valeur de l'accuracy de validation est un peu plus faible que celle d'entraînement, cela 
 s'explique par plusieurs facteurs, notamment la difficulté du modèle à généraliser aux nouveaux mots inconnus.
@@ -272,12 +272,12 @@ de $94,4\%$. Néanmoins, si on souhaite d'intéresser à l'accuracy micro, nous 
     \label{fig: results supertag}
 \end{figure}
 
-L'apprentissage est satisfaisant car les courbes d'entraînement et de validation suivent la même allure d'après les 
+L'apprentissage est satisfaisant, car les courbes d'entraînement et de validation suivent la même allure d'après les 
 Figures~\ref{fig: model supertag}. 
 On peut expliquer la meilleure performance
 de la validation par rapport à l'entraînement par l'utilisation du dropout dans l'apprentissage. Cette méthode est présente lors
 de l'entraînement, ce qui va naturellement baisser ses performances. 
-Néanmoins, il y a un risque de surapprentissage lorsque l'on considère le modèle selon l'accuracy allgood. 
+Néanmoins, il y a un risque de overfitting lorsque l'on considère le modèle selon l'accuracy allgood. 
 
 \begin{figure}[H]
     \centering
@@ -299,7 +299,7 @@ Néanmoins, il y a un risque de surapprentissage lorsque l'on considère le mod�
 \end{figure}
 
 Le modèle \textit{SEPARATE} témoigne d'un apprentissage satisfaisant, où par rapport au modèle précédent, le risque d'overfitting 
-semble plus faible selon l'accurcy allgood, avec néanmoins de l'instabilité qui subsiste, d'après les 
+semble plus faible selon l'accuracy et allgood, avec néanmoins de l'instabilité qui subsiste, d'après les 
 Figures~\ref{fig: results separate}.
 
 \begin{figure}[H]
@@ -321,7 +321,7 @@ Figures~\ref{fig: results separate}.
     \label{fig: results fusion}
 \end{figure}
 
-Le modèle \textit{FUSION} témoigne d'un apprentissage satisfaisant et relativement meilleur que celui des modèles précédent, à 
+Le modèle \textit{FUSION} témoigne d'un apprentissage satisfaisant et relativement meilleur que celui des modèles précédents, à 
 travers les Figures~\ref{fig: model fusion}.
 
 
@@ -345,9 +345,9 @@ travers les Figures~\ref{fig: model fusion}.
 \end{table}
 
 Les résultats du Table~\ref{tab: test morphy} mettent en comparaison les résultats de performances entre les modèles.
-Le modèle baseline indique une performance d'accuracy de 98\% et domme les autres.
-Entre les trois autres modèles, c'est le modèle \textit{SEPARATE} qui performe le mieux en terme d'accuracy micro, cependant,
-c'est le modèle \textit{FUSION} qui performe le mieux en terme d'accuracy allgood. 
+Le modèle baseline indique une performance d'accuracy de 98\% et donne les autres.
+Entre les trois autres modèles, c'est le modèle \textit{SEPARATE} qui performe le mieux en termes d’accuracy micro, cependant,
+c'est le modèle \textit{FUSION} qui performe le mieux en termes d’accuracy allgood. 
 
 Néanmoins, ces modèles ne permettent pas de dépasser les performances de la baseline, alors que les modèles implémentés ont une
 significative complexité plus importante que celle de la baseline.
@@ -356,9 +356,9 @@ Ce qui se peut s'expliquer principalement parce que les \textit{morphy} des mots
 
 \section{Inférences}
 
-Nous avons ensuite testé nos différents modèles en leurs fasant prédire les \textit{morphy} sur une phrase. Nous avons fait
-l'inférences sur la phrase : \textit{Les bananes sont jaunes et mûrs.}. Comme cette phrase n'a que 7 mots (6 mots et un point),
-on rajoute 3 caractères de padding <PAD>. Les Tables~\ref{tab: bananes} et \ref{tab: lastpad} représente respectivement les
+Nous avons ensuite testé nos différents modèles en leurs faisant prédire les \textit{morphy} sur une phrase. Nous avons fait
+l'inférence sur la phrase : \textit{Les bananes sont jaunes et mûrs.}. Comme cette phrase n'a que 7 mots (6 mots et un point),
+on rajoute 3 caractères de padding <PAD>. Les Tables~\ref{tab: bananes} et \ref{tab: lastpad} représentent respectivement les
 \textit{morphy} prédit par les modèles du mot \textit{bananes} et du dernier <PAD>.
 \begin{table}[H]
     \centering
@@ -404,11 +404,11 @@ on rajoute 3 caractères de padding <PAD>. Les Tables~\ref{tab: bananes} et \ref
 \end{table} 
 
 Le modèle \textit{SEPARATE}, pour le dernier <PAD>, prédit bien du <PAD> mais également d'autres 
-labels qui n'ont rien à voir et qui sont incorrects. Une raison peut être que la séparation des couches présentes dans notre modèle 
+labels qui n'ont rien à voir et qui sont incorrects. Une raison peut-être que la séparation des couches présentes dans notre modèle 
 implique que certaines couches denses ne communiquent plus entre elles à une certaine étape de notre modèle pour réaliser leur 
 inférence.
 
-D'autre part, le modèle \textit{FUSION} prédit un nombre superflu de labels de manière général, plus que nécessaire. Le modèle 
+D'autre part, le modèle \textit{FUSION} prédit un nombre superflu de labels de manière générale, plus que nécessaire. Le modèle 
 combine non seulement cette architecture de séparation de couches denses pour différentes classes, mais également une fusion qui multiplie alors le nombre de labels inféré. 
 
 Dans cette perspective d'inférence, le modèle \textit{SUPERTAG} semble relativement plus pertinent en fournissant un nombre 
@@ -431,12 +431,12 @@ obtenu une accuracy micro de 89.3\% et une métrique \textit{all good} de 4.6\%,
 morphologiques pour chaque classe. Cependant, le modèle \textit{FUSION} a montré une instabilité lors de l'entraînement, ce
 qui peut nécessiter des ajustements pour améliorer ses performances.
 
-Néanmoins, ces performances sont à prendre avec du recul et à nuancer car nos résultats d'inférences sont assez décevants. Cela est 
-sûrement dû à des problématiques intrinsèques aux architectures adoptés dans nos modèles, ce qui mérite une investigation plus 
+Néanmoins, ces performances sont à prendre avec du recul et à nuancer, car nos résultats d'inférences sont assez décevants. Cela est 
+sûrement dû à des problématiques intrinsèques aux architectures adoptées dans nos modèles, ce qui mérite une investigation plus 
 poussée et des perspectives à étudier. 
 
 Les résultats obtenus ouvrent des perspectives intéressantes pour l'amélioration des modèles de langage, en particulier dans le
-contexte du français. Des ajustements futurs pourraient inclure des stratégies plus sophistiquées pour la gestion des mots
+contexte du Français. Des ajustements futurs pourraient inclure des stratégies plus sophistiquées pour la gestion des mots
 inconnus et des expériences avec d'autres architectures de modèles.
 
 Ce projet a donc permis d'explorer différentes facettes de la modélisation du langage, de la prédiction des parties du discours à
