@@ -1,12 +1,29 @@
-But de ce repo:
-avoir les Traits morphologiques pour chaque mots à partir de phrase.
+Get `morphy` from sentences using LSTM
 
-# Data:
+<p align="center"><img src=report\morphy.png><p>
+Example of morphy.
+
+# Table of Contents
+- [Table of Contents](#table-of-contents)
+- [Data](#data)
+- [Requirements](#requirements)
+- [Launch the code](#launch-the-code)
+  - [Mode](#mode)
+  - [Example](#example)
+- [Model](#model)
+  - [POS prediction](#pos-prediction)
+    - [GET\_POS](#get_pos)
+  - [MORPHY prediction](#morphy-prediction)
+    - [SUPERTAG](#supertag)
+    - [SEPARATE](#separate)
+    - [FUSION](#fusion)
+- [Results](#results)
+
+
+# Data
 
 - find the data here: http://hdl.handle.net/11234/1-5287
-- Download all files in item
-- unzip it
-- keep only the file `ud-treebanks-v2.13.tgz`
+- Download ud-treebanks-v2.13.tgz
 - use `tar -xvzf ud-treebanks-v2.13.tgz` to unstack the tgz file
 - and move data in order have a path like:
 
@@ -28,72 +45,91 @@ avoir les Traits morphologiques pour chaque mots à partir de phrase.
     │   ├── ...                      
     │   └── ...                                  
 
-
-# Dataloader:
-
-have data configuration like:
-```yaml
-data:
-  path: data                  # data path
-  language: French            # Language of data
-  sequence_length: 10         # length of sequence
-  pad: <PAD>                  # pad caracter to make padding
-  unk: <UNK>                  # unknow caracter
-  sequence_function: dummy    # function to split sentences to sequences
-  indexes: [1, 3, 5]          # index of information that will be recupered: 
-                                # indexes representation: 
-                                # 0: id       1: word    2: lemma   3: pos   4: unk
-                                # 5: morphy   6: syntax  7: unk     8: unk   9: unk 
-  vocab:
-    path: dictionary          # path to save the vocabulary
-    unk_rate: 0.01            # rate to replace a knowing word by <UNK>
-    save: true                # save the vocabulary or load it from data.voc.path
-    num_words: 67814
+# Requirements
+To run the code you need python (We use python 3.9.13) and packages that is indicate in [`requirements.txt`](requirements.txt).
+You can run the following code to install all packages in the correct versions:
+```sh
+pip install -r requirements.txt
 ```
 
+# Launch the code
 
-## Create sequences:
-'dummy': This is the most basic way. We cut the sentences without overlapping and add a completion character at the end to get the right size. For example, the sentence:\
-   ['`I`', '`think`', '`,`', '`threfore`', '`I`', '`am`', '`.`']\
-    will become\
-   [['`I`', '`think`', '`,`', '`threfore`'], ['`I`', '`am`', '`.`', '`PAD`']]\
-   if sequence_size is 4 and the completion character is '`PAD`'. 
-
-Sure, here's an updated Markdown paragraph for your README file:
-
----
-
-## Using the Main Script
-
-The [`main.py`](command:_github.copilot.openRelativePath?%5B%22main.py%22%5D "main.py") script is the main entry point for this project. It accepts several command-line arguments to control its behavior:
+The [`main.py`](main.py) script is the main entry point for this project. It accepts several command-line arguments to control its behavior:
 
 - `--mode` or `-m`: This option allows you to choose a mode between 'train', 'baseline', 'test', and 'infer'.
-- [`--config_path`](command:_github.copilot.openSymbolInFile?%5B%22main.py%22%2C%22--config_path%22%5D "main.py") or [`-c`](command:_github.copilot.openSymbolInFile?%5B%22src%2Ftrain.py%22%2C%22-c%22%5D "src/train.py"): This option allows you to specify the path to the configuration file for training. The default is [`config/config.yaml`](command:_github.copilot.openRelativePath?%5B%22config%2Fconfig.yaml%22%5D "config/config.yaml").
-- [`--path`](command:_github.copilot.openSymbolInFile?%5B%22main.py%22%2C%22--path%22%5D "main.py") or `-p`: This option allows you to specify the experiment path for testing, prediction, or generation.
-- [`--task`](command:_github.copilot.openSymbolInFile?%5B%22src%2Fmetrics.py%22%2C%22--task%22%5D "src/metrics.py") or `-t`: This option allows you to specify the task for the model. This will overwrite the task specified in the configuration file for training.
+- `--config_path` or `-c`: This option allows you to specify the path to the configuration file for training. The default is [`config/config.yaml`](config/config.yaml).
+- `--path` or `-p`: This option allows you to specify the experiment path for testing, prediction, or generation.
+- `--task` or `-t`: This option allows you to specify the task for the model. This will overwrite the task specified in the configuration file for training.
 
+## Mode
 Here's what each mode does:
 
-- [`train`](command:_github.copilot.openSymbolInFile?%5B%22src%2Ftrain.py%22%2C%22train%22%5D "src/train.py"): Trains a model using the configuration specified in the [`--config_path`](command:_github.copilot.openSymbolInFile?%5B%22main.py%22%2C%22--config_path%22%5D "main.py") and the task specified in [`--task`](command:_github.copilot.openSymbolInFile?%5B%22src%2Fmetrics.py%22%2C%22--task%22%5D "src/metrics.py").
+- [`train`](src/train.py): Trains a model using the configuration specified in the `--config_path` and the task specified in `--task`.
 - `baseline`: Runs the baseline benchmark test.
-- `test`: Tests the model specified in the [`--path`](command:_github.copilot.openSymbolInFile?%5B%22launch_inference.py%22%2C%22--path%22%5D "launch_inference.py"). You must specify a path.
-- [`infer`](command:_github.copilot.openRelativePath?%5B%22infer%22%5D "infer"): Runs inference using the model specified in the [`--path`](command:_github.copilot.openSymbolInFile?%5B%22launch_inference.py%22%2C%22--path%22%5D "launch_inference.py") It will run inference on some exemple sentences located in "infer/infer.txt" and put the results in "infer/configname_infer.txt". If the path is 'baseline', it will run the baseline inference. You must specify a path.
+- [`test`](src/test.py): Tests the model specified in the `--path`. You must specify a path.
+- [`infer`](src/infer): Runs inference using the model specified in the `--path` It will run inference on some exemple sentences located in "infer/infer.txt" and put the results in "infer/configname_infer.txt". If the path is 'baseline', it will run the baseline inference. You must specify a path.
 
+## Example
 Here's an example of how to use the script to train a model:
 
 ```sh
 python main.py --mode train --config_path config/config.yaml --task get_pos
 ```
+This command will train a model using the configuration specified in [`config/config.yaml`](config/config.yaml) with a `task=get_pos`.
+
+
+Here's an example of how to run a test on the experiment separete:
+
+```sh
+python main.py --mode test --path logs/separete
+```
+
 Here is an exemple of how to run inference using the baseline model:
 ```sh
 python main.py --mode infer --path baseline
 ```
-This command will train a model using the configuration specified in [`config/config.yaml`](command:_github.copilot.openRelativePath?%5B%22config%2Fconfig.yaml%22%5D "config/config.yaml") and the task 'get_pos'.
 
----
+# Model
 
-Please replace the example paths and tasks with the actual paths and tasks you want to use in your project.
+## POS prediction
+input shape: $B \times K$
+output shape: $B \times K \times 19$
+where $B$ is batch size, $K$ sequence size and $19$ the number of POS classes
 
+### GET_POS
+<p align="center"><img src=report\get_pos.png><p>
+
+## MORPHY prediction
+input shape: $B \times K$
+output shape: $B \times K \times 28 \times 13$
+where $B$ is batch size, $K$ sequence size and $28$ the number of MORPHY classes and $13$ the maximun of number possibilities of one morphy.
+
+### SUPERTAG
+<p align="center"><img src=report\get_morphy_supertag.png><p>
+
+### SEPARATE
+<p align="center"><img src=report\get_morphy_separate.png><p>
+
+### FUSION
+<p align="center"><img src=report\get_morphy_fusion.png><p>
+
+# Results
+
+| model         | crossentropy | accuracy micro  | accuracy macro  |
+| ------------- | ------------ | --------------- | --------------- |
+| *GET_POS*     | 0.204        | 0.944           | 0.816           |
+
+*Table 1: Test results for pos prediction*
+
+
+| model         | crossentropy | accuracy micro | all good |
+| ------------- | ------------ | --------------- | -------- |
+| *BASELINE*    | -            | 0.980           | 0.791    |
+| *SUPERTAG*    | 1.700        | 0.436           | 0.002    |
+| *SEPARATE*    | 1.70         | 0.893           | 0.046    |
+| *FUSION*      | 1.698        | 0.884           | 0.154    |
+
+*Table 2: Test results for morphy prediction*
 
 
 
