@@ -59,90 +59,40 @@ data:
    [['`I`', '`think`', '`,`', '`threfore`'], ['`I`', '`am`', '`.`', '`PAD`']]\
    if sequence_size is 4 and the completion character is '`PAD`'. 
 
-## Model Training
-# Pos-tagging training
-In the config.yaml file make sure you have this: 
-```yaml
-task options
-task:
-    task_name: get_pos     # task do to: must be get_pos or get_morphy
-    get_pos_info:
-        num_classes: 19         # number of POS classes
-    get_morphy_info:
-        num_classes: 28         # number of MORPHY classes
-        num_features: 13        # number of max classes possibility
-        use_pos: true              # use POS to get MORPHY
-```
-
-Then run the launch_train.py file to launch training of model with this configuration.
-
-# Morphological traits training
-In the config.yaml file make sure you have this: 
-```yaml
-task options
-task:
-    task_name: get_morphy     # task do to: must be get_pos or get_morphy
-    get_pos_info:
-        num_classes: 19         # number of POS classes
-    get_morphy_info:
-        num_classes: 28         # number of MORPHY classes
-        num_features: 13        # number of max classes possibility
-        use_pos: true              # use POS to get MORPHY
-```
-
-Then run the launch_train.py file to launch training of model with this configuration.
-
-## Test 
-# Run test on pos-tagging
-
-
-To run inference using the [`launch_inference.py`](command:_github.copilot.openRelativePath?%5B%22launch_inference.py%22%5D "launch_inference.py") script, follow these steps:
-
-1. Ensure that you have a dictionary file in the [`dictionary/`](command:_github.copilot.openRelativePath?%5B%22dictionary%2F%22%5D "dictionary/") directory. For example, you might have a file named `French.json`.
-
-2. Set the [`experiment_path`](command:_github.copilot.openSymbolInFile?%5B%22launch_inference.py%22%2C%22experiment_path%22%5D "launch_inference.py") variable to the path of the experiment you want to run inference on. For example, you might set it to [`logs/get_pos_French`](command:_github.copilot.openRelativePath?%5B%22logs%2Fget_pos_French%22%5D "logs/get_pos_French").
-
-3. Define the [`sentence`](command:_github.copilot.openSymbolInFile?%5B%22launch_inference.py%22%2C%22sentence%22%5D "launch_inference.py") variable as a list of words for which you want to run inference. For example:
-
-```python
-sentence = ['je', 'veux', 'un','chien', '.','Mais ça','narrivera','pas','.','Je','nai','pas','argent','.']
-```
-
-4. Run the [`launch_inference.py`](command:_github.copilot.openRelativePath?%5B%22launch_inference.py%22%5D "launch_inference.py") script. The script will load the dictionary, run inference on the sentence using the specified experiment, and print the sentence and its part-of-speech tags.
-
-Here's an example of how to run the script:
-
-```sh
-python launch_inference.py
-```
-
-The output will look something like this:
-
-```
-sentence: ['je', 'veux', 'un', 'chien', '.', 'Mais ça', 'narrivera', 'pas', '.', 'Je', 'nai', 'pas', 'argent', '.']
-POS: ['PRON', 'VERB', 'DET', 'NOUN', 'PUNCT', 'CONJ', 'VERB', 'ADV', 'PUNCT', 'PRON', 'VERB', 'ADV', 'NOUN', 'PUNCT']
-```
-
-This indicates that the word 'je' is a pronoun, 'veux' is a verb, 'un' is a determiner, and so on.
+Sure, here's an updated Markdown paragraph for your README file:
 
 ---
 
-# Run test on morphological traits
+## Using the Main Script
 
-Running for morphological traits is the same as for pos-tagging, except that you need to set the ['experiment_path'](command:_github.copilot.openSymbolInFile?%5B%22launch_inference.py%22%2C%22experiment_path%22%5D "launch_inference.py") variable to the path of the experiment you want to run inference on. For example, you might set it to ['logs/separate'](command:_github.copilot.openRelativePath?%5B%22logs%2Fget_morphy_French%22%5D "logs/get_morphy_French") or ['logs/fusion'](command:_github.copilot.openRelativePath?%5B%22logs%2Fget_morphy_French%22%5D "logs/separate") or ['logs/supertag'](command:_github.copilot.openRelativePath?%5B%22logs%2Fget_morphy_French%22%5D "logs/fusion").
+The [`main.py`](command:_github.copilot.openRelativePath?%5B%22main.py%22%5D "main.py") script is the main entry point for this project. It accepts several command-line arguments to control its behavior:
 
-The output will look something like this:
+- `--mode` or `-m`: This option allows you to choose a mode between 'train', 'baseline', 'test', and 'infer'.
+- [`--config_path`](command:_github.copilot.openSymbolInFile?%5B%22main.py%22%2C%22--config_path%22%5D "main.py") or [`-c`](command:_github.copilot.openSymbolInFile?%5B%22src%2Ftrain.py%22%2C%22-c%22%5D "src/train.py"): This option allows you to specify the path to the configuration file for training. The default is [`config/config.yaml`](command:_github.copilot.openRelativePath?%5B%22config%2Fconfig.yaml%22%5D "config/config.yaml").
+- [`--path`](command:_github.copilot.openSymbolInFile?%5B%22main.py%22%2C%22--path%22%5D "main.py") or `-p`: This option allows you to specify the experiment path for testing, prediction, or generation.
+- [`--task`](command:_github.copilot.openSymbolInFile?%5B%22src%2Fmetrics.py%22%2C%22--task%22%5D "src/metrics.py") or `-t`: This option allows you to specify the task for the model. This will overwrite the task specified in the configuration file for training.
+
+Here's what each mode does:
+
+- [`train`](command:_github.copilot.openSymbolInFile?%5B%22src%2Ftrain.py%22%2C%22train%22%5D "src/train.py"): Trains a model using the configuration specified in the [`--config_path`](command:_github.copilot.openSymbolInFile?%5B%22main.py%22%2C%22--config_path%22%5D "main.py") and the task specified in [`--task`](command:_github.copilot.openSymbolInFile?%5B%22src%2Fmetrics.py%22%2C%22--task%22%5D "src/metrics.py").
+- `baseline`: Runs the baseline benchmark test.
+- `test`: Tests the model specified in the [`--path`](command:_github.copilot.openSymbolInFile?%5B%22launch_inference.py%22%2C%22--path%22%5D "launch_inference.py"). You must specify a path.
+- [`infer`](command:_github.copilot.openRelativePath?%5B%22infer%22%5D "infer"): Runs inference using the model specified in the [`--path`](command:_github.copilot.openSymbolInFile?%5B%22launch_inference.py%22%2C%22--path%22%5D "launch_inference.py") It will run inference on some exemple sentences located in "infer/infer.txt" and put the results in "infer/configname_infer.txt". If the path is 'baseline', it will run the baseline inference. You must specify a path.
+
+Here's an example of how to use the script to train a model:
 
 ```sh
-WORD: je
-OUTPUT: ['Not', 'Not', 'No', 'Neut', 'Sing', '1', 'Emp', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Sup', 'Not', 'Not', 'Not', 'Digit', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not']
-WORD: veux
-OUTPUT: ['Not', 'Not', 'Not', 'Not', 'Sing', '3', 'Tot', 'Not', 'Not', 'Fut', 'Fin', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Vrnc', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not', 'Not']
-WORD: un
-OUTPUT: ['Not', 'Not', 'Not', 'Neut', 'Sing', 'Not', 'Emp', 'Not', 'Not', 'Not', 'Not', 'Mult', 'Not', 'Not', 'Not', 'Not', 'Not', 'Sup', 'Arch', 'Not', 'Not', 'Digit', 'Not', 'Not', 'Not', 'Not', 'Ind', 'Not']
-...
+python main.py --mode train --config_path config/config.yaml --task get_pos
 ```
+Here is an exemple of how to run inference using the baseline model:
+```sh
+python main.py --mode infer --path baseline
+```
+This command will train a model using the configuration specified in [`config/config.yaml`](command:_github.copilot.openRelativePath?%5B%22config%2Fconfig.yaml%22%5D "config/config.yaml") and the task 'get_pos'.
 
+---
+
+Please replace the example paths and tasks with the actual paths and tasks you want to use in your project.
 
 
 
